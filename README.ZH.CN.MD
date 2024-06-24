@@ -1,3 +1,5 @@
+[英文](https://github.com/zsea/amis-server/blob/master/README.MD)
+
 基于百度AMIS实现的简单后台管理系统。
 
 # 功能

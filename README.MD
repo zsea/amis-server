@@ -1,3 +1,4 @@
+[中文](https://github.com/zsea/amis-server/blob/master/README.ZH.CN.MD)
 A Simple Backend Management System Implemented with Baidu AMIS
 
 # Features
