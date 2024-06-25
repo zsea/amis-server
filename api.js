@@ -7,8 +7,31 @@ const crypto = require("crypto");
 const JWT = require('jsonwebtoken');
 const { getModels } = require("./extends");
 
-
+/**
+ * 解析token到用户对象
+ * @param {string} JWT_SECRET - 生成JWT的密钥
+ * @param {string} tokenName - 生成cookie的名称
+ * @returns 
+ */
+function useUser(JWT_SECRET, tokenName) {
+    tokenName = tokenName || "amis_token";
+    return function user(ctx) {
+        const token = ctx.cookies.get(tokenName);
+        if (!token || !token.length) {
+            return false;
+        }
+        try {
+            var payload = JWT.verify(token, JWT_SECRET);
+            ctx.user = payload;
+        }
+        catch (e) {
+            return false;
+        }
+        return false;
+    }
+}
 function useAuthenticate(db) {
+
     /**
  * 默认的权限检测方法
  * @param {object} ctx 
@@ -66,13 +89,14 @@ async function canVisit(user, model, db) {
 // });
 /**
  * Amis Server对象
+ * @constructor
  * @param {Router} router 
  * @param {Linq} db 
  * @param {string} JWT_SECRET - 生成JWT的密钥
- * @param {string} tokenName? - 生成cookie的名称
+ * @param {string} tokenName - 生成cookie的名称
  */
-function AmisServer(router, db, JWT_SECRET,tokenName) {
-    tokenName=tokenName||"amis_token";
+function AmisServer(router, db, JWT_SECRET, tokenName) {
+    tokenName = tokenName || "amis_token";
     var isAllow = function (user, model) {
         return canVisit(user, model);
     }
@@ -81,24 +105,8 @@ function AmisServer(router, db, JWT_SECRET,tokenName) {
     const self = this;
     this.emptyRouter = emptyRouter;
     this.routers = [emptyRouter, router];
-    router.use(async function (ctx, next) {
-        const token = ctx.cookies.get(tokenName);
-        if (!token || !token.length) {
-
-            return await next();
-        }
-        try {
-            var payload = JWT.verify(token, JWT_SECRET);
-            ctx.user = payload;
-        }
-        catch (e) {
-            return await next();
-        }
-        await next();
-    });
     this.setPermission("limit", "权限管理");
     this.setPermission("system", "系统设置");
-
     router.post("login", '/login', async function login(ctx) {
         const { password, username, rember } = ctx.request.body;
         if (!username) {
@@ -208,7 +216,7 @@ function AmisServer(router, db, JWT_SECRET,tokenName) {
     });
 
     router.get("/allow.js", async function (ctx) {
-        const models = getModels([router, emptyRouter]);
+        const models = getModels(self.routers);
         const ___allow___ = {};
         async function loadLimit(children) {
             for (const m of children) {
@@ -279,7 +287,7 @@ function AmisServer(router, db, JWT_SECRET,tokenName) {
                 }]
             }
         }
-    });
+    }).setPermission("登录");
 
     router.get("login", "/schema/:id", async function (ctx) {
         const { id } = ctx.params
@@ -877,5 +885,6 @@ function useAmisServer(router, db, JWT_SECRET) {
 module.exports = {
     AmisServer,
     useAuthenticate,
-    useAmisServer
+    useAmisServer,
+    useUser
 };

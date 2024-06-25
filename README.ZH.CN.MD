@@ -25,12 +25,15 @@ const { htmlPath,extendRouter,AmisServer,useAmisServer,useAuthenticate } = requi
 1. 为```Router```对象添加权限设置方法，方便自己开发模块时可以直接设置模块的错误。
 
 ```js
-extendRouter(Router,useAuthenticate(db));
+extendRouter(Router,useAuthenticate(db),useUser(SECRET,tokenName));
 ```
 
 * db为基于[linq2mysql](https://www.npmjs.com/package/linq2mysql)的```Linq```实例。
 * ```Router```为```koa-router```类。
 * ```useAuthenticate```为实现的权限验证模块，你也可以实现自己的权限验证模块。
+* ```useUser```转换cookie中token内容为user对象的方法。你也可以实现自己的转换函数，函数签名为：```parseUser(ctx)```。
+    * SECRET - JWT的密钥
+    * tokenName - cookie存储token的名称。默认值：amis_token
 
 2. 创建一个```AmisServer```对象，```AmisServer```中实现了基本的权限管理功能。
 
@@ -84,3 +87,40 @@ router.get('test','/api/texxt',(ctx)=>{ctx.body="OK"}).setPermission('测试');
 ```js
 server.appendRouter(router);
 ```
+
+# 使用封装的数据库操作方法
+
+库中封装了常用的数据库操作方法。
+
+* usePager - 从数据库中分页查询数据
+* useUpdater - 更新数据库中的数据
+* useDeleter - 从数据为中删除记录
+* useInsertOrUpdate - 向数据库中写入记录，如果存在，则更新。
+* useInsert - 向数据库中写入记录。
+
+## 参数说明
+
+* useTable - 回调函数，返回一个```Linq```对象。
+* useQuery - 根据配置生成一个操作的```object```的值。
+
+### 示例
+
+**useTable**
+
+```js
+useTable(()=>db.table("users"));
+```
+
+**useQuery**
+```js
+{
+    id:({query,body,user})=>query.id
+}
+```
+在上面的对象中，```id```的值会在运行时生成。```query```和```body```分别是```GET```和```POST```传入的对象。```user```为当前登录对象。
+
+> 上面说的```POST```实际指：POST/PATCH等可以传入body的方法。
+
+# 其它
+
+```amis.sql```为```mysql```的数据表创建语句。

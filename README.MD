@@ -31,6 +31,9 @@ extendRouter(Router, useAuthenticate(db));
 * `db` is a `Linq` instance based on [linq2mysql](https://www.npmjs.com/package/linq2mysql).
 * `Router` is the `koa-router` class.
 * `useAuthenticate` is the implemented permission verification module; you can also implement your own permission verification module.
+* `useUser` is A method for transforming the token content in the cookie into a user object. You can also implement your own conversion function with the function signature: `parseUser(ctx)`.
+    * SECRET - The secret key for JWT.
+    * tokenName - The name of the cookie that stores the token. Default value: `amis_token`.
 
 2. Create an `AmisServer` object, which implements basic permission management functionality.
 
@@ -86,3 +89,41 @@ In order to see the corresponding module in permission management, this route ne
 ```javascript
 server.appendRouter(router);
 ```
+
+# Using Encapsulated Database Operation Methods
+
+The library encapsulates common database operation methods.
+
+* usePager - Query data from the database with pagination
+* useUpdater - Update data in the database
+* useDeleter - Delete records from the database
+* useInsertOrUpdate - Insert a record into the database, or update if it exists
+* useInsert - Insert a record into the database
+
+## Parameter Description
+
+* useTable - A callback function that returns a `Linq` object.
+* useQuery - Generates an operational `object` value based on the configuration.
+
+### Example
+
+**useTable**
+
+```javascript
+useTable(() => db.table("users"));
+```
+
+**useQuery**
+```javascript
+{
+    id: ({ query, body, user }) => query.id
+}
+```
+
+In the above object, the value of `id` will be generated at runtime. `query` and `body` are the objects passed in via `GET` and `POST`, respectively. `user` is the current logged-in object.
+
+> The term `POST` mentioned above actually refers to: methods that can pass a body, such as POST/PATCH, etc.
+
+# Miscellaneous
+
+The `amis.sql` file contains the MySQL table creation statements.

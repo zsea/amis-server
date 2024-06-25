@@ -1,13 +1,14 @@
-const warp = function (fn, anonymous, hasPermission, model) {
+const warp = function (fn, anonymous, hasPermission, model, parseUser) {
 
     return async function (ctx, next) {
+        await Promise.resolve(parseUser(ctx));
         if (!anonymous && hasPermission && typeof hasPermission === "function") {
             await Promise.resolve(hasPermission(ctx, function () {
                 return fn(ctx, next);
             }, model));
         }
         else {
-            return fn(ctx, next,model);
+            return fn(ctx, next, model);
         }
 
     }
@@ -16,8 +17,9 @@ const warp = function (fn, anonymous, hasPermission, model) {
  * 
  * @param {*} Router 
  * @param {Function} hasPermission - 用户权限判断
+ * @param {Function} parseUser - 用户权限判断 
  */
-function extendRouter(Router, hasPermission) {
+function extendRouter(Router, hasPermission, parseUser) {
     Router.prototype.setPermission = function (text, anonymous) {
         const laster = this.stack[this.stack.length - 1];
         if (laster) {
@@ -27,7 +29,7 @@ function extendRouter(Router, hasPermission) {
                 if (laster.stack[i].isAmis === true) {
                     continue;
                 }
-                laster.stack[i] = warp(laster.stack[i], anonymous, hasPermission, laster.name);
+                laster.stack[i] = warp(laster.stack[i], anonymous, hasPermission, laster.name, parseUser);
                 laster.stack[i].isAmis = true;
             }
         }
