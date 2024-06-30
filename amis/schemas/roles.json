@@ -1,0 +1,385 @@
+{
+    "data": {
+        "type": "page",
+        "body": [
+            {
+                "type": "crud",
+                "syncLocation": false,
+                "api": {
+                    "method": "get",
+                    "url": "/api/amis/authorize/roles"
+                },
+                "bulkActions": [],
+                "itemActions": [],
+                "headerToolbar": [
+                    {
+                        "label": "新增",
+                        "type": "button",
+                        "actionType": "dialog",
+                        "level": "primary",
+                        "editorSetting": {
+                            "behavior": "create"
+                        },
+                        "dialog": {
+                            "title": "新增",
+                            "body": [
+                                {
+                                    "type": "form",
+                                    "api": {
+                                        "method": "post",
+                                        "url": "/api/amis/authorize/role"
+                                    },
+                                    "body": [
+                                        {
+                                            "type": "uuid",
+                                            "name": "id",
+                                            "id": "u:877d1c7e49a9"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "name",
+                                            "label": "名称",
+                                            "id": "u:df1fa4ac4fc4"
+                                        },
+                                        {
+                                            "type": "textarea",
+                                            "name": "desc",
+                                            "label": "描述",
+                                            "id": "u:f3168910bfce"
+                                        }
+                                    ],
+                                    "id": "u:e23637f8ca07",
+                                    "actions": [
+                                        {
+                                            "type": "submit",
+                                            "label": "提交",
+                                            "primary": true
+                                        }
+                                    ],
+                                    "feat": "Insert"
+                                }
+                            ],
+                            "type": "dialog",
+                            "id": "u:3492a17654d1",
+                            "actions": [
+                                {
+                                    "type": "button",
+                                    "actionType": "cancel",
+                                    "label": "取消",
+                                    "id": "u:6fd8f1df67a0"
+                                },
+                                {
+                                    "type": "button",
+                                    "actionType": "confirm",
+                                    "label": "确定",
+                                    "primary": true,
+                                    "id": "u:e0dde6528f27"
+                                }
+                            ]
+                        },
+                        "id": "u:0e90d66c6644",
+                        "disabledOn": "___allow___['limit:roles:add']!==true"
+                    },
+                    {
+                        "type": "button",
+                        "id": "u:5fc158585e04",
+                        "label": "",
+                        "align": "right",
+                        "actionType": "reload",
+                        "target": "t:roles",
+                        "icon": "fa fa-repeat"
+                    },
+                    {
+                        "type": "bulk-actions"
+                    }
+                ],
+                "columns": [
+                    {
+                        "name": "name",
+                        "label": "名称",
+                        "type": "text",
+                        "id": "u:110ac0118ba3",
+                        "placeholder": "-"
+                    },
+                    {
+                        "name": "desc",
+                        "label": "描述",
+                        "type": "text",
+                        "id": "u:46d5e472e069"
+                    },
+                    {
+                        "type": "date",
+                        "label": "创建时间",
+                        "name": "created_at",
+                        "id": "u:c5de9de32241",
+                        "placeholder": "-",
+                        "valueFormat": "x",
+                        "format": "YYYY-MM-DD HH:mm:ss"
+                    },
+                    {
+                        "type": "operation",
+                        "label": "操作",
+                        "buttons": [
+                            {
+                                "type": "button",
+                                "label": "权限",
+                                "id": "u:9db6944f0dfc",
+                                "level": "link",
+                                "actionType": "drawer",
+                                "drawer": {
+                                    "title": "角色权限设置 - ${name}",
+                                    "body": {
+                                        "type": "service",
+                                        "api": "/api/amis/role/models?id=${id}",
+                                        "body": {
+                                            "type": "table",
+                                            "footable": true,
+                                            "columns": [
+                                                {
+                                                    "name": "name",
+                                                    "label": "模块"
+                                                },
+                                                {
+                                                    "name": "allow",
+                                                    "label": "允许",
+                                                    "align": "center",
+                                                    "type": "checkbox",
+                                                    "onEvent": {
+                                                        "change": {
+                                                            "actions": [
+                                                                {
+                                                                    "actionType": "ajax",
+                                                                    "api": {
+                                                                        "method": "post",
+                                                                        "url": "/api/amis/authorize/roles/permissions",
+                                                                        "data": {
+                                                                            "oid": "${oid}",
+                                                                            "value": "${event.data.value}",
+                                                                            "model": "${id}",
+                                                                            "type": "allow"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "name": "deny",
+                                                    "label": "拒绝",
+                                                    "align": "center",
+                                                    "type": "checkbox",
+                                                    "onEvent": {
+                                                        "change": {
+                                                            "actions": [
+                                                                {
+                                                                    "actionType": "ajax",
+                                                                    "api": {
+                                                                        "method": "post",
+                                                                        "url": "/api/amis/authorize/roles/permissions",
+                                                                        "data": {
+                                                                            "oid": "${oid}",
+                                                                            "value": "${event.data.value}",
+                                                                            "model": "${id}",
+                                                                            "type": "deny"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "actions": []
+                                },
+                                "disabledOn": "___allow___['limit:roles:permissions']!==true"
+                            },
+                            {
+                                "type": "button",
+                                "label": "账号",
+                                "level": "link",
+                                "visibleOn": "this.id!=='00000000-0000-0000-0000-000000000000'",
+                                "actionType": "dialog",
+                                "dialog": {
+                                    "title": "账号设置",
+                                    "size": "lg",
+                                    "actions": [],
+                                    "body": [
+                                        {
+                                            "type": "service",
+                                            "api": "/api/amis/authorize/roles/users?id=${id}",
+                                            "body": [
+                                                {
+                                                    "type": "transfer",
+                                                    "name": "transfer",
+                                                    "selectMode": "table",
+                                                    "source": "${items}",
+                                                    "onEvent": {
+                                                        "change": {
+                                                            "actions": [
+                                                                {
+                                                                    "actionType": "ajax",
+                                                                    "api": {
+                                                                        "method": "post",
+                                                                        "url": "/api/amis/authorize/roles/users",
+                                                                        "data": {
+                                                                            "users": "${value}",
+                                                                            "role": "${id}"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "id": "u:25b1e0bd793d",
+                                                    "columns": [
+                                                        {
+                                                            "name": "username",
+                                                            "label": "账号",
+                                                            "id": "u:81b13116c4d1"
+                                                        },
+                                                        {
+                                                            "name": "status",
+                                                            "label": "状态",
+                                                            "type": "mapping",
+                                                            "map": {
+                                                                "enable": "<span class='label label-success'>正常</span>",
+                                                                "disabled": "<span class='label label-danger'>禁用</span>",
+                                                                "*": "<span class='label label-warning'>未知</span>"
+                                                            },
+                                                            "id": "u:96aa2c30fd20"
+                                                        }
+                                                    ],
+                                                    "valueTpl": "${username}",
+                                                    "value": "${users}"
+                                                }
+                                            ],
+                                            "id": "u:726678305dbe",
+                                            "dsType": "api"
+                                        }
+                                    ],
+                                    "type": "dialog",
+                                    "id": "u:458c8c1ef103",
+                                    "showCloseButton": true,
+                                    "closeOnOutside": false,
+                                    "closeOnEsc": false,
+                                    "showErrorMsg": true,
+                                    "showLoading": true,
+                                    "draggable": false
+                                },
+                                "disabledOn": "___allow___['limit:user:role']!==true",
+                                "id": "u:aaed58a8b2f4"
+                            },
+                            {
+                                "label": "编辑",
+                                "type": "button",
+                                "actionType": "dialog",
+                                "level": "link",
+                                "editorSetting": {
+                                    "behavior": "update"
+                                },
+                                "dialog": {
+                                    "title": "编辑",
+                                    "body": [
+                                        {
+                                            "type": "form",
+                                            "api": "post:/api/amis/authorize/role",
+                                            "body": [
+                                                {
+                                                    "type": "uuid",
+                                                    "name": "id",
+                                                    "id": "u:bec04808bf91"
+                                                },
+                                                {
+                                                    "name": "name",
+                                                    "label": "名称",
+                                                    "type": "input-text",
+                                                    "id": "u:459bd34776a4"
+                                                },
+                                                {
+                                                    "name": "desc",
+                                                    "label": "描述",
+                                                    "type": "textarea",
+                                                    "id": "u:02bb3652848e"
+                                                }
+                                            ],
+                                            "id": "u:1a645f538871",
+                                            "actions": [
+                                                {
+                                                    "type": "submit",
+                                                    "label": "提交",
+                                                    "primary": true
+                                                }
+                                            ],
+                                            "feat": "Insert"
+                                        }
+                                    ],
+                                    "type": "dialog",
+                                    "id": "u:69d7c439fd82",
+                                    "actions": [
+                                        {
+                                            "type": "button",
+                                            "actionType": "cancel",
+                                            "label": "取消",
+                                            "id": "u:c032996909e5"
+                                        },
+                                        {
+                                            "type": "button",
+                                            "actionType": "confirm",
+                                            "label": "确定",
+                                            "primary": true,
+                                            "id": "u:3f879b652e2c"
+                                        }
+                                    ]
+                                },
+                                "id": "u:98cbe130d32e",
+                                "visibleOn": "${id!=='00000000-0000-0000-0000-000000000000'}",
+                                "disabledOn": "___allow___['limit:roles:add']!==true"
+                            },
+                            {
+                                "type": "button",
+                                "label": "删除",
+                                "actionType": "ajax",
+                                "level": "link",
+                                "className": "text-danger",
+                                "confirmText": "确定要删除？",
+                                "api": {
+                                    "method": "delete",
+                                    "url": "/api/amis/authorize/role?id=${id}"
+                                },
+                                "editorSetting": {
+                                    "behavior": "delete"
+                                },
+                                "id": "u:64eda410613c",
+                                "visibleOn": "${id!=='00000000-0000-0000-0000-000000000000'}",
+                                "disabledOn": "___allow___['limit:roles:delete']!==true"
+                            }
+                        ],
+                        "id": "u:7eeb6681c74d"
+                    }
+                ],
+                "id": "t:roles",
+                "perPageAvailable": [
+                    10
+                ],
+                "messages": {},
+                "itemBadge": {
+                    "text": "系统",
+                    "mode": "ribbon",
+                    "position": "top-left",
+                    "level": "info",
+                    "visibleOn": "this.id==='00000000-0000-0000-0000-000000000000'"
+                }
+            }
+        ],
+        "regions": [
+            "body"
+        ],
+        "id": "u:4e849f1b1570",
+        "pullRefresh": {
+            "disabled": true
+        }
+    }
+}

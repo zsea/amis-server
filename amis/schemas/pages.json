@@ -1,0 +1,396 @@
+{
+    "data": {
+        "type": "page",
+        "body": {
+            "id": "t:pages",
+            "type": "crud",
+            "columnsTogglable":false,
+            "api": "/api/amis/system/pages",
+            "quickSaveItemApi": {
+                "method": "patch",
+                "url": "/api/amis/user/status",
+                "data": {
+                    "id": "${id}",
+                    "status": "${status}"
+                }
+            },
+            "saveImmediately": true,
+            "itemBadge": {
+                "text": "系统",
+                "mode": "ribbon",
+                "position": "top-left",
+                "level": "danger",
+                "visibleOn": "this.is_system_page===1"
+            },
+            "columns": [
+                
+                {
+                    "name": "label",
+                    "label": "名称",
+                    "type":"tpl",
+                    "tpl":"${order} - ${label}"
+                },
+                {
+                    "name": "url",
+                    "label": "URL"
+                },
+                {
+                    "name": "status",
+                    "label": "状态",
+                    "type": "mapping",
+                    "map": {
+                        "enable": "<span class='label label-success'>正常</span>",
+                        "disabled": "<span class='label label-danger'>禁用</span>",
+                        "*": "<span class='label label-warning'>未知</span>"
+                    }
+                },
+                {
+                    "name": "created_at",
+                    "label": "创建时间",
+                    "type": "date",
+                    "valueFormat": "x",
+                    "format": "YYYY-MM-DD HH:mm:ss"
+                },
+                {
+                    "type": "operation",
+                    "label": "操作",
+                    "buttons": [
+                        {
+                            "label": "设置",
+                            "type": "button",
+                            "level": "link",
+                            "visibleOn": "this.is_system_page===0",
+                            "disabledOn": "___allow___['system:pages:editor']!==true",
+                            "actionType": "drawer",
+                            "drawer": {
+                                "title": "设置页面",
+                                "body": {
+                                    "type": "form",
+                                    "api": {
+                                        "method": "patch",
+                                        "url": "/api/amis/system/page"
+                                    },
+                                    "body": [
+                                        {
+                                            "type": "uuid",
+                                            "name": "id"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "label",
+                                            "label": "名称",
+                                            "required": true,
+                                            "validateOnChange": true
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "icon",
+                                            "label": "图标"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "url",
+                                            "label": "访问路径(URL)",
+                                            "required": true,
+                                            "validateOnChange": true
+                                        },
+                                        {
+                                            "type": "radios",
+                                            "name": "schema_mode",
+                                            "label": "配置模式",
+                                            "options": [
+                                                {
+                                                    "label": "JSON",
+                                                    "value": "json"
+                                                },
+                                                {
+                                                    "label": "URL",
+                                                    "value": "url"
+                                                }
+                                            ],
+                                            "value": "json",
+                                            "description": "JSON模式请在页面管理中编辑。"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "schema_api",
+                                            "label": "SCHEMA路径",
+                                            "visibleOn": "${schema_mode == 'url'}",
+                                            "required": true,
+                                            "validateOnChange": true
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "link",
+                                            "label": "外部链接"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "redirect",
+                                            "label": "跳转目标"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "rewrite",
+                                            "label": "重写"
+                                        },
+                                        {
+                                            "type": "select",
+                                            "name": "model",
+                                            "label": "权限模块",
+                                            "source": {
+                                                "method": "get",
+                                                "url": "/api/amis/system/page/models?id=-1",
+                                                "adaptor": "function iter(items){if(!items){return;}\nreturn items.map(x=>({value:x.id,label:x.name,children:iter(x.children)}));}\nreturn {status:payload.status,data:{items:iter(payload.data.items)}};;"
+                                            },
+                                            "selectMode": "tree",
+                                            "required": true,
+                                            "validateOnChange": true
+                                        },
+                                        {
+                                            "type": "select",
+                                            "name": "pid",
+                                            "label": "父页面",
+                                            "source": "${ARRAYMAP(items,item=>({label:item.label,value:item.id,children:item.children}))}",
+                                            "selectMode": "tree",
+                                            "clearable": true
+                                        },
+                                        {
+                                            "type": "input-number",
+                                            "name": "order",
+                                            "label": "序号",
+                                            "value": 0,
+                                            "required": true,
+                                            "validateOnChange": true
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "class_name",
+                                            "label": "样式名称",
+                                            "description": "html中class属性值。"
+                                        },
+                                        {
+                                            "type": "control",
+                                            "label": "",
+                                            "body": {
+                                                "type": "group",
+                                                "mode": "inline",
+                                                "body": [
+                                                    {
+                                                        "type": "checkbox",
+                                                        "name": "is_default_page",
+                                                        "option": "默认页"
+                                                    },
+                                                    {
+                                                        "type": "checkbox",
+                                                        "name": "visible",
+                                                        "option": "可见"
+                                                    },
+                                                    {
+                                                        "type": "checkbox",
+                                                        "name": "status",
+                                                        "option": "启用",
+                                                        "trueValue": "enable",
+                                                        "falseValue": "disabled"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "label": "编辑",
+                            "type": "button",
+                            "level": "link",
+                            "visibleOn": "this.is_system_page===0",
+                            "disabledOn": "___allow___['system:pages:editor']!==true",
+                            "onEvent": {
+                                "click": {
+                                    "actions": [
+                                        {
+                                            "actionType": "custom",
+                                            "script": "showEditor(event.data,doAction);"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "label": "删除",
+                            "type": "button",
+                            "level": "link",
+                            "className": "text-danger",
+                            "visibleOn": "this.is_system_page===0",
+                            "actionType": "ajax",
+                            "confirmText": "确认要删除页面 【${label}】？",
+                            "confirmTitle": "请确认",
+                            "api": "delete:/api/amis/system/page?id=${id}",
+                            "reload": "t:pages",
+                            "disabledOn": "___allow___['system:pages:delete']!==true||(this.children&&this.children.length)"
+                        }
+                    ]
+                }
+            ],
+            "headerToolbar": [
+                {
+                    "label": "添加页面",
+                    "type": "button",
+                    "actionType": "drawer",
+                    "icon": "fa fa-plus",
+                    "level": "primary",
+                    "disabledOn": "___allow___['system:pages:add']!==true",
+                    "drawer": {
+                        "title": "添加页面",
+                        "body": {
+                            "type": "form",
+                            "api": {
+                                "method": "post",
+                                "url": "/api/amis/system/page"
+                            },
+                            "body": [
+                                {
+                                    "type": "uuid",
+                                    "name": "id"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "label",
+                                    "label": "名称",
+                                    "required": true,
+                                    "validateOnChange": true
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "icon",
+                                    "label": "图标"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "url",
+                                    "label": "访问路径(URL)",
+                                    "required": true,
+                                    "validateOnChange": true
+                                },
+                                {
+                                    "type": "radios",
+                                    "name": "schema_mode",
+                                    "label": "配置模式",
+                                    "options": [
+                                        {
+                                            "label": "JSON",
+                                            "value": "json"
+                                        },
+                                        {
+                                            "label": "URL",
+                                            "value": "url"
+                                        }
+                                    ],
+                                    "value": "json",
+                                    "description": "JSON模式请在页面管理中编辑。"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "schema_api",
+                                    "label": "SCHEMA路径",
+                                    "visibleOn": "${schema_mode == 'url'}",
+                                    "required": true,
+                                    "validateOnChange": true
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "link",
+                                    "label": "外部链接"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "redirect",
+                                    "label": "跳转目标"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "rewrite",
+                                    "label": "重写"
+                                },
+                                {
+                                    "type": "select",
+                                    "name": "model",
+                                    "label": "权限模块",
+                                    "source": {
+                                        "method": "get",
+                                        "url": "/api/amis/system/page/models?id=-1",
+                                        "adaptor": "function iter(items){if(!items){return;}\nreturn items.map(x=>({value:x.id,label:x.name,children:iter(x.children)}));}\nreturn {status:payload.status,data:{items:iter(payload.data.items)}};;"
+                                    },
+                                    "selectMode": "tree",
+                                    "required": true,
+                                    "validateOnChange": true
+                                },
+                                {
+                                    "type": "select",
+                                    "name": "pid",
+                                    "label": "父页面",
+                                    "source": "${ARRAYMAP(items,item=>({label:item.label,value:item.id,children:item.children}))}",
+                                    "selectMode": "tree",
+                                    "clearable": true
+                                },
+                                {
+                                    "type": "input-number",
+                                    "name": "order",
+                                    "label": "序号",
+                                    "value": 0,
+                                    "required": true,
+                                    "validateOnChange": true
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "class_name",
+                                    "label": "样式名称",
+                                    "description": "html中class属性值。"
+                                },
+                                {
+                                    "type": "control",
+                                    "label": "",
+                                    "body": {
+                                        "type": "group",
+                                        "mode": "inline",
+                                        "body": [
+                                            {
+                                                "type": "checkbox",
+                                                "name": "is_default_page",
+                                                "option": "默认页"
+                                            },
+                                            {
+                                                "type": "checkbox",
+                                                "name": "visible",
+                                                "option": "可见",
+                                                "value": true
+                                            },
+                                            {
+                                                "type": "checkbox",
+                                                "name": "status",
+                                                "option": "启用",
+                                                "value": "enable",
+                                                "trueValue": "enable",
+                                                "falseValue": "disabled"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "label": "",
+                    "icon": "fa fa-repeat",
+                    "type": "button",
+                    "disabledOn": "___allow___['system:pages']!==true",
+                    "actionType": "reload",
+                    "target": "t:pages",
+                    "align": "right"
+                }
+            ]
+        }
+    }
+}

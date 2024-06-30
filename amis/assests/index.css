@@ -1,0 +1,6 @@
+.index-logo-left-bg {
+    background-color: rgb(61,130, 255);
+    background-image: url(index-left-bg.png);
+    background-repeat: no-repeat;
+    background-position: right bottom;
+}

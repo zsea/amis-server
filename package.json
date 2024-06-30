@@ -1,12 +1,23 @@
 {
   "name": "@zsea/amis-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Frontend and backend universal package based on Amis.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon ./test/index.js",
+    "package":"asar p ./amis ./amis.asar"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@koa/router": "^12.0.1",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "linq2mysql": "^2.0.0",
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  }
 }

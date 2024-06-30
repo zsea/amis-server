@@ -1,0 +1,353 @@
+{
+    "data": {
+        "type": "page",
+        "body": {
+            "id": "t:users",
+            "type": "crud",
+            "api": "/api/amis/users",
+            "quickSaveItemApi": {
+                "method": "patch",
+                "url": "/api/amis/user/status",
+                "data": {
+                    "id": "${id}",
+                    "status": "${status}"
+                }
+            },
+            "saveImmediately": true,
+            "itemBadge": {
+                "text": "创建者",
+                "mode": "ribbon",
+                "position": "top-left",
+                "level": "info",
+                "visibleOn": "this.id==='00000000-0000-0000-0000-000000000000'"
+            },
+            "columns": [
+                {
+                    "name": "username",
+                    "label": "账号"
+                },
+                {
+                    "name": "status",
+                    "label": "状态",
+                    "type": "mapping",
+                    "map": {
+                        "enable": "<span class='label label-success'>正常</span>",
+                        "disabled": "<span class='label label-danger'>禁用</span>",
+                        "*": "<span class='label label-warning'>未知</span>"
+                    },
+                    "quickEditEnabledOn": "___allow___['limit:user:status']===true&&this.id!=='00000000-0000-0000-0000-000000000000'",
+                    "quickEdit": {
+                        "label": "状态",
+                        "type": "radios",
+                        "options": [
+                            {
+                                "label": "正常",
+                                "value": "enable"
+                            },
+                            {
+                                "label": "禁用",
+                                "value": "disabled"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "created_at",
+                    "label": "创建时间",
+                    "type": "date",
+                    "valueFormat": "x",
+                    "format": "YYYY-MM-DD HH:mm:ss"
+                },
+                {
+                    "type": "operation",
+                    "label": "操作",
+                    "buttons": [
+                        {
+                            "label": "角色",
+                            "type": "button",
+                            "level": "link",
+                            "visibleOn": "this.id!=='00000000-0000-0000-0000-000000000000'",
+                            "actionType": "dialog",
+                            "dialog": {
+                                "title": "角色设置",
+                                "size": "lg",
+                                "actions": [],
+                                "body": {
+                                    "type": "service",
+                                    "api": "/api/amis/user/roles?uid=${id}",
+                                    "body": {
+                                        "type": "transfer",
+                                        "name": "transfer",
+                                        "selectMode": "table",
+                                        "valueTpl": "${name}",
+                                        "columns": [
+                                            {
+                                                "name": "name",
+                                                "label": "名称"
+                                            },
+                                            {
+                                                "name": "desc",
+                                                "label": "描述"
+                                            }
+                                        ],
+                                        "value": "${roles}",
+                                        "source": "${items}",
+                                        "onEvent": {
+                                            "change": {
+                                                "actions": [
+                                                    {
+                                                        "actionType": "ajax",
+                                                        "api": {
+                                                            "method": "post",
+                                                            "url": "/api/amis/user/roles",
+                                                            "data": {
+                                                                "roles": "${value}",
+                                                                "uid": "${id}"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "disabledOn": "___allow___['limit:user:role']!==true"
+                        },
+                        {
+                            "label": "权限",
+                            "type": "button",
+                            "level": "link",
+                            "visibleOn": "this.id!=='00000000-0000-0000-0000-000000000000'",
+                            "actionType": "drawer",
+                            "drawer": {
+                                "title": "账号权限设置 - ${username}",
+                                "body": {
+                                    "type": "service",
+                                    "api": "/api/amis/user/models?id=${id}",
+                                    "body": {
+                                        "type": "table",
+                                        "footable": true,
+                                        "columns": [
+                                            {
+                                                "name": "name",
+                                                "label": "模块"
+                                            },
+                                            {
+                                                "name": "allow",
+                                                "label": "允许",
+                                                "align": "center",
+                                                "type": "checkbox",
+                                                "onEvent": {
+                                                    "change": {
+                                                        "actions": [
+                                                            {
+                                                                "actionType": "ajax",
+                                                                "api": {
+                                                                    "method": "post",
+                                                                    "url": "/api/amis/user/permissions",
+                                                                    "data": {
+                                                                        "oid": "${oid}",
+                                                                        "value": "${event.data.value}",
+                                                                        "model": "${id}",
+                                                                        "type": "allow"
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "name": "deny",
+                                                "label": "拒绝",
+                                                "align": "center",
+                                                "type": "checkbox",
+                                                "onEvent": {
+                                                    "change": {
+                                                        "actions": [
+                                                            {
+                                                                "actionType": "ajax",
+                                                                "api": {
+                                                                    "method": "post",
+                                                                    "url": "/api/amis/user/permissions",
+                                                                    "data": {
+                                                                        "oid": "${oid}",
+                                                                        "value": "${event.data.value}",
+                                                                        "model": "${id}",
+                                                                        "type": "deny"
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "actions": []
+                            },
+                            "disabledOn": "___allow___['limit:user:permissions']!==true"
+                        },
+                        {
+                            "label": "删除",
+                            "type": "button",
+                            "level": "link",
+                            "className": "text-danger",
+                            "visibleOn": "this.id !== '00000000-0000-0000-0000-000000000000'",
+                            "actionType": "ajax",
+                            "confirmText": "确认要删除账号 【${username}】？",
+                            "confirmTitle": "请确认",
+                            "api": "delete:/api/amis/user?id=${id}",
+                            "reload": "t:users",
+                            "disabledOn": "___allow___['limit:user:delete']!==true"
+                        },
+                        {
+                            "type": "button",
+                            "level": "link",
+                            "label": "重设密码",
+                            "className": "text-primary",
+                            "visibleOn": "this.id !== '00000000-0000-0000-0000-000000000000'",
+                            "disabledOn": "___allow___['limit:user:editor']!==true",
+                            "actionType": "dialog",
+                            "dialog": {
+                                "title": "重设密码",
+                                "body": {
+                                    "type": "form",
+                                    "api": {
+                                        "method": "patch",
+                                        "url": "/api/amis/limit/user",
+                                        "data": {
+                                            "id": "${id}",
+                                            "password": "${password}",
+                                            "status": "${status}",
+                                            "username": "${username}"
+                                        },
+                                        "requestAdaptor": "api.data.password=CryptoJS.MD5(api.data.password).toString()"
+                                    },
+                                    "body": [
+                                        {
+                                            "type": "uuid",
+                                            "name": "id"
+                                        },
+                                        {
+                                            "type": "input-text",
+                                            "name": "username",
+                                            "required": true,
+                                            "label": "账号",
+                                            "disabled":true
+                                        },
+                                        {
+                                            "type": "input-password",
+                                            "name": "password",
+                                            "required": true,
+                                            "label": "新密码"
+                                        },
+                                        {
+                                            "type": "input-password",
+                                            "name": "cfgPassword",
+                                            "required": true,
+                                            "label": "确认新密码",
+                                            "validations": {
+                                                "equalsField": "password"
+                                            },
+                                            "validationErrors": {
+                                                "equalsField": "两次密码不一致。"
+                                            }
+                                        },
+                                        {
+                                            "type": "switch",
+                                            "name": "status",
+                                            "label": "状态",
+                                            "onText": "正常",
+                                            "offText": "禁用",
+                                            "trueValue": "enable",
+                                            "falseValue": "disabled"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "headerToolbar": [
+                {
+                    "label": "添加账号",
+                    "type": "button",
+                    "actionType": "dialog",
+                    "icon": "fa fa-plus",
+                    "level": "primary",
+                    "disabledOn": "___allow___['limit:user:add']!==true",
+                    "dialog": {
+                        "title": "添加账号",
+                        "body": {
+                            "type": "form",
+                            "api": {
+                                "method": "post",
+                                "url": "/api/amis/limit/user",
+                                "data": {
+                                    "id": "${id}",
+                                    "password": "${password}",
+                                    "status": "${status}",
+                                    "username": "${username}"
+                                },
+                                "requestAdaptor": "api.data.password=CryptoJS.MD5(api.data.password).toString()"
+                            },
+                            "body": [
+                                {
+                                    "type": "uuid",
+                                    "name": "id"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "username",
+                                    "required": true,
+                                    "label": "账号"
+                                },
+                                {
+                                    "type": "input-password",
+                                    "name": "password",
+                                    "required": true,
+                                    "label": "密码"
+                                },
+                                {
+                                    "type": "input-password",
+                                    "name": "cfgPassword",
+                                    "required": true,
+                                    "label": "确认密码",
+                                    "validations": {
+                                        "equalsField": "password"
+                                    },
+                                    "validationErrors": {
+                                        "equalsField": "两次密码不一致。"
+                                    }
+                                },
+                                {
+                                    "type": "switch",
+                                    "name": "status",
+                                    "label": "状态",
+                                    "onText": "正常",
+                                    "offText": "禁用",
+                                    "trueValue": "enable",
+                                    "falseValue": "disabled",
+                                    "value": "enable"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "label": "",
+                    "icon": "fa fa-repeat",
+                    "type": "button",
+                    "disabledOn": "___allow___['limit:user']!==true",
+                    "actionType": "reload",
+                    "target": "t:users",
+                    "align": "right"
+                }
+            ]
+        }
+    }
+}
