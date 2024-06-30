@@ -11,7 +11,7 @@ A Simple Backend Management System Implemented with Baidu AMIS
 # Installation
 
 ```shell
-npm install --save @zsea/amis-server
+npm install --save @zsea/amis-server  --only=production
 ```
 
 # Usage

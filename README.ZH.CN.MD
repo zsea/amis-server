@@ -11,7 +11,7 @@
 # 安装
 
 ```
-npm install --save @zsea/amis-server
+npm install --save @zsea/amis-server  --only=production
 ```
 
 # 使用
