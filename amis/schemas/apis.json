@@ -1,0 +1,656 @@
+{
+    "data": {
+        "type": "page",
+        "body": [
+            {
+                "type": "crud",
+                "syncLocation": false,
+                "api": {
+                    "method": "get",
+                    "url": "/api/amis/settings/apis",
+                    "requestAdaptor": "",
+                    "adaptor": "",
+                    "messages": {}
+                },
+                "bulkActions": [],
+                "itemActions": [],
+                "headerToolbar": [
+                    {
+                        "label": "新增",
+                        "type": "button",
+                        "actionType": "drawer",
+                        "level": "primary",
+                        "editorSetting": {
+                            "behavior": "create"
+                        },
+                        "id": "u:b457a42bde0f",
+                        "drawer": {
+                            "title": "新增接口",
+                            "body": {
+                                "type": "form",
+                                "api": {
+                                    "method": "post",
+                                    "url": "/api/amis/settings/apis",
+                                    "requestAdaptor": "",
+                                    "adaptor": "",
+                                    "messages": {}
+                                },
+                                "body": [
+                                    {
+                                        "type": "input-text",
+                                        "name": "id",
+                                        "required": true,
+                                        "label": "ID",
+                                        "description": "以:进行层级分隔。"
+                                    },
+                                    {
+                                        "type": "input-text",
+                                        "name": "name",
+                                        "required": true,
+                                        "label": "名称"
+                                    },
+                                    {
+                                        "type": "input-text",
+                                        "name": "path",
+                                        "required": true,
+                                        "label": "路径",
+                                        "placeholder": "/api/"
+                                    },
+                                    {
+                                        "type": "select",
+                                        "name": "method",
+                                        "label": "方法",
+                                        "options": [
+                                            {
+                                                "label": "GET",
+                                                "value": "GET"
+                                            },
+                                            {
+                                                "label": "POST",
+                                                "value": "POST"
+                                            },
+                                            {
+                                                "label": "PATCH",
+                                                "value": "PATCH"
+                                            },
+                                            {
+                                                "label": "DELETE",
+                                                "value": "DELETE"
+                                            },
+                                            {
+                                                "label": "OPTIONS",
+                                                "value": "OPTIONS"
+                                            },
+                                            {
+                                                "label": "HEAD",
+                                                "value": "HEAD"
+                                            }
+                                        ],
+                                        "required": true,
+                                        "value": "GET"
+                                    },
+                                    {
+                                        "type": "radios",
+                                        "name": "status",
+                                        "label": "状态",
+                                        "required": true,
+                                        "options": [
+                                            {
+                                                "label": "启用",
+                                                "value": "enable"
+                                            },
+                                            {
+                                                "label": "禁用",
+                                                "value": "disabled"
+                                            }
+                                        ],
+                                        "value": "enable"
+                                    },
+                                    {
+                                        "type": "input-number",
+                                        "name": "order",
+                                        "label": "排序",
+                                        "value": 0
+                                    },
+                                    {
+                                        "type": "radios",
+                                        "name": "type",
+                                        "label": "代码类型",
+                                        "required": true,
+                                        "options": [
+                                            {
+                                                "label": "简单",
+                                                "value": "simple"
+                                            },
+                                            {
+                                                "label": "自定义",
+                                                "value": "customize"
+                                            }
+                                        ],
+                                        "value": "simple"
+                                    },
+                                    {
+                                        "type": "control",
+                                        "label": "代码",
+                                        "visibleOn": "${type==='customize'}",
+                                        "body": [
+                                            {
+                                                "type": "code",
+                                                "language": "javascript",
+                                                "value": "async function(ctx,next){"
+                                            },
+                                            {
+                                                "type": "editor",
+                                                "allowFullscreen": true,
+                                                "language": "javascript",
+                                                "label": false,
+                                                "name": "codes",
+                                                "placeholder": "ctx.body = {\n    status:0\n};"
+                                            },
+                                            {
+                                                "type": "code",
+                                                "language": "javascript",
+                                                "value": "}"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "radios",
+                                        "label": "封装函数",
+                                        "required": true,
+                                        "name": "usefunc",
+                                        "visibleOn": "${type==='simple'}",
+                                        "value": "usePager",
+                                        "options": [
+                                            {
+                                                "label": "usePager",
+                                                "value": "usePager"
+                                            },
+                                            {
+                                                "label": "useUpdater",
+                                                "value": "useUpdater"
+                                            },
+                                            {
+                                                "label": "useDeleter",
+                                                "value": "useDeleter"
+                                            },
+                                            {
+                                                "label": "useInsert",
+                                                "value": "useInsert"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "control",
+                                        "label": "参数",
+                                        "visibleOn": "${type==='simple'}",
+                                        "body": [
+                                            {
+                                                "type": "editor",
+                                                "allowFullscreen": true,
+                                                "language": "javascript",
+                                                "label": "useTable",
+                                                "name": "table",
+                                                "required": true,
+                                                "placeholder": "()=>db.table(\"amis\")",
+                                                "size": "line5",
+                                                "options": {
+                                                    "lineNumbers": "on"
+                                                }
+                                            },
+                                            {
+                                                "type": "editor",
+                                                "allowFullscreen": true,
+                                                "language": "javascript",
+                                                "label": "where",
+                                                "name": "where",
+                                                "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
+                                                "placeholder": "p=>p.id==='abc'&&p.order>1",
+                                                "size": "line5",
+                                                "options": {
+                                                    "lineNumbers": "on"
+                                                }
+                                            },
+                                            {
+                                                "type": "editor",
+                                                "allowFullscreen": true,
+                                                "language": "javascript",
+                                                "label": "variables",
+                                                "name": "variables",
+                                                "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
+                                                "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                "size": "line5",
+                                                "options": {
+                                                    "lineNumbers": "on"
+                                                }
+                                            },
+                                            {
+                                                "type": "editor",
+                                                "allowFullscreen": true,
+                                                "language": "javascript",
+                                                "label": "entity",
+                                                "name": "entity",
+                                                "required": true,
+                                                "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
+                                                "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                "size": "line5",
+                                                "options": {
+                                                    "lineNumbers": "on"
+                                                }
+                                            },
+                                            {
+                                                "name": "fields",
+                                                "label": "返回字段",
+                                                "mode": "horizontal",
+                                                "type": "input-array",
+                                                "visibleOn": "${usefunc==='usePager'}",
+                                                "value": [],
+                                                "scaffold": "",
+                                                "inline": true,
+                                                "items": {
+                                                    "type": "input-text",
+                                                    "clearable": false
+                                                }
+                                            },
+                                            {
+                                                "name": "descByTime",
+                                                "label": "",
+                                                "type": "checkbox",
+                                                "value": true,
+                                                "visibleOn": "${usefunc==='usePager'}",
+                                                "option": "按时间倒序"
+                                            },
+                                            {
+                                                "name": "hasTime",
+                                                "label": "",
+                                                "type": "checkbox",
+                                                "value": true,
+                                                "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
+                                                "option": "表中包含时间日期字段"
+                                            },
+                                            {
+                                                "name": "updater",
+                                                "label": "",
+                                                "type": "checkbox",
+                                                "value": false,
+                                                "visibleOn": "${usefunc==='useInsert'}",
+                                                "option": "主键冲突时更新已存在的记录"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            "size": "lg"
+                        }
+                    },
+                    {
+                        "type": "bulk-actions"
+                    },
+                    {
+                        "type": "button",
+                        "tpl": "内容",
+                        "wrapperComponent": "",
+                        "id": "u:c374c69e0bb1",
+                        "label": "",
+                        "align": "right",
+                        "icon": "fa fa-repeat",
+                        "target": "u:2d6e7fa5fee2",
+                        "actionType": "reload"
+                    }
+                ],
+                "id": "t:apiscrud",
+                "perPageAvailable": [
+                    10
+                ],
+                "messages": {},
+                "perPage": "",
+                "filterSettingSource": [
+                    "id",
+                    "name",
+                    "method",
+                    "status",
+                    "order",
+                    "codes",
+                    "created_at",
+                    "updated_at",
+                    "level",
+                    "parent"
+                ],
+                "columns": [
+                    {
+                        "label": "名称",
+                        "name": "name",
+                        "id": "u:2119de954156",
+                        "type": "tpl",
+                        "tpl": "${order} - ${name}"
+                    },
+                    {
+                        "label": "接口",
+                        "type": "tpl",
+                        "name": "path",
+                        "tpl":"${method}:${path}"
+                    },
+                    {
+                        "name": "type",
+                        "label": "类型",
+                        "type": "mapping",
+                        "map": {
+                            "simple": "简单",
+                            "customize": "自定义",
+                            "*": "<span class='label label-warning'>未知</span>"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "label": "状态",
+                        "type": "mapping",
+                        "map": {
+                            "enable": "<span class='label label-success'>正常</span>",
+                            "disabled": "<span class='label label-danger'>禁用</span>",
+                            "*": "<span class='label label-warning'>未知</span>"
+                        }
+                    },
+                    {
+                        "name": "created_at",
+                        "label": "创建时间",
+                        "type": "date",
+                        "valueFormat": "x",
+                        "format": "YYYY-MM-DD HH:mm:ss"
+                    },
+                    {
+                        "label": "ID",
+                        "type": "text",
+                        "name": "id"
+                    },
+                    {
+                        "type": "operation",
+                        "label": "操作",
+                        "buttons": [
+                            {
+                                "label": "编辑",
+                                "type": "button",
+                                "level": "link",
+                                "disabledOn": "___allow___['system:apis:patch']!==true",
+                                "actionType": "drawer",
+                                "drawer": {
+                                    "title": "编辑接口 - ${name}",
+                                    "size": "lg",
+                                    "body": {
+                                        "type": "form",
+                                        "api": {
+                                            "method": "patch",
+                                            "url": "/api/amis/settings/apis?id=${id}"
+                                        },
+                                        "body": [
+                                            {
+                                                "type": "input-text",
+                                                "name": "id",
+                                                "required": true,
+                                                "label": "ID",
+                                                "description": "以:进行层级分隔。"
+                                            },
+                                            {
+                                                "type": "input-text",
+                                                "name": "name",
+                                                "required": true,
+                                                "label": "名称"
+                                            },
+                                            {
+                                                "type": "input-text",
+                                                "name": "path",
+                                                "required": true,
+                                                "label": "路径",
+                                                "placeholder": "/api/"
+                                            },
+                                            {
+                                                "type": "select",
+                                                "name": "method",
+                                                "label": "方法",
+                                                "options": [
+                                                    {
+                                                        "label": "GET",
+                                                        "value": "GET"
+                                                    },
+                                                    {
+                                                        "label": "POST",
+                                                        "value": "POST"
+                                                    },
+                                                    {
+                                                        "label": "PATCH",
+                                                        "value": "PATCH"
+                                                    },
+                                                    {
+                                                        "label": "DELETE",
+                                                        "value": "DELETE"
+                                                    },
+                                                    {
+                                                        "label": "OPTIONS",
+                                                        "value": "OPTIONS"
+                                                    },
+                                                    {
+                                                        "label": "HEAD",
+                                                        "value": "HEAD"
+                                                    }
+                                                ],
+                                                "required": true,
+                                                "value": "GET"
+                                            },
+                                            {
+                                                "type": "radios",
+                                                "name": "status",
+                                                "label": "状态",
+                                                "required": true,
+                                                "options": [
+                                                    {
+                                                        "label": "启用",
+                                                        "value": "enable"
+                                                    },
+                                                    {
+                                                        "label": "禁用",
+                                                        "value": "disabled"
+                                                    }
+                                                ],
+                                                "value": "enable"
+                                            },
+                                            {
+                                                "type": "input-number",
+                                                "name": "order",
+                                                "label": "排序",
+                                                "value": 0
+                                            },
+                                            {
+                                                "type": "radios",
+                                                "name": "type",
+                                                "label": "代码类型",
+                                                "required": true,
+                                                "options": [
+                                                    {
+                                                        "label": "简单",
+                                                        "value": "simple"
+                                                    },
+                                                    {
+                                                        "label": "自定义",
+                                                        "value": "customize"
+                                                    }
+                                                ],
+                                                "value": "simple"
+                                            },
+                                            {
+                                                "type": "control",
+                                                "label": "代码",
+                                                "visibleOn": "${type==='customize'}",
+                                                "body": [
+                                                    {
+                                                        "type": "code",
+                                                        "language": "javascript",
+                                                        "value": "async function(ctx,next){"
+                                                    },
+                                                    {
+                                                        "type": "editor",
+                                                        "allowFullscreen": true,
+                                                        "language": "javascript",
+                                                        "label": false,
+                                                        "name": "codes",
+                                                        "placeholder": "ctx.body = {\n    status:0\n};"
+                                                    },
+                                                    {
+                                                        "type": "code",
+                                                        "language": "javascript",
+                                                        "value": "}"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "radios",
+                                                "label": "封装函数",
+                                                "required": true,
+                                                "name": "usefunc",
+                                                "visibleOn": "${type==='simple'}",
+                                                "value": "usePager",
+                                                "options": [
+                                                    {
+                                                        "label": "usePager",
+                                                        "value": "usePager"
+                                                    },
+                                                    {
+                                                        "label": "useUpdater",
+                                                        "value": "useUpdater"
+                                                    },
+                                                    {
+                                                        "label": "useDeleter",
+                                                        "value": "useDeleter"
+                                                    },
+                                                    {
+                                                        "label": "useInsert",
+                                                        "value": "useInsert"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "control",
+                                                "label": "参数",
+                                                "visibleOn": "${type==='simple'}",
+                                                "body": [
+                                                    {
+                                                        "type": "editor",
+                                                        "allowFullscreen": true,
+                                                        "language": "javascript",
+                                                        "label": "useTable",
+                                                        "name": "table",
+                                                        "required": true,
+                                                        "placeholder": "()=>db.table(\"amis\")",
+                                                        "size": "line5",
+                                                        "options": {
+                                                            "lineNumbers": "on"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "editor",
+                                                        "allowFullscreen": true,
+                                                        "language": "javascript",
+                                                        "label": "where",
+                                                        "name": "where",
+                                                        "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
+                                                        "placeholder": "p=>p.id==='abc'&&p.order>1",
+                                                        "size": "line5",
+                                                        "options": {
+                                                            "lineNumbers": "on"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "editor",
+                                                        "allowFullscreen": true,
+                                                        "language": "javascript",
+                                                        "label": "variables",
+                                                        "name": "variables",
+                                                        "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
+                                                        "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                        "size": "line5",
+                                                        "options": {
+                                                            "lineNumbers": "on"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "editor",
+                                                        "allowFullscreen": true,
+                                                        "language": "javascript",
+                                                        "label": "entity",
+                                                        "name": "entity",
+                                                        "required": true,
+                                                        "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
+                                                        "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                        "size": "line5",
+                                                        "options": {
+                                                            "lineNumbers": "on"
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "fields",
+                                                        "label": "返回字段",
+                                                        "mode": "horizontal",
+                                                        "type": "input-array",
+                                                        "visibleOn": "${usefunc==='usePager'}",
+                                                        "value": [],
+                                                        "scaffold": "",
+                                                        "inline": true,
+                                                        "items": {
+                                                            "type": "input-text",
+                                                            "clearable": false
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "descByTime",
+                                                        "label": "",
+                                                        "type": "checkbox",
+                                                        "value": true,
+                                                        "visibleOn": "${usefunc==='usePager'}",
+                                                        "option": "按时间倒序"
+                                                    },
+                                                    {
+                                                        "name": "hasTime",
+                                                        "label": "",
+                                                        "type": "checkbox",
+                                                        "value": true,
+                                                        "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
+                                                        "option": "表中包含时间日期字段"
+                                                    },
+                                                    {
+                                                        "name": "updater",
+                                                        "label": "",
+                                                        "type": "checkbox",
+                                                        "value": false,
+                                                        "visibleOn": "${usefunc==='useInsert'}",
+                                                        "option": "主键冲突时更新已存在的记录"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "label": "删除",
+                                "type": "button",
+                                "level": "link",
+                                "className": "text-danger",
+                                "actionType": "ajax",
+                                "confirmText": "确认要删除接口 【${name}】？",
+                                "confirmTitle": "请确认",
+                                "api": "delete:/api/amis/settings/api?id=${id}",
+                                "reload": "t:apiscrud",
+                                "disabledOn": "___allow___['system:apis:delete']!==true||(this.children&&this.children.length)"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "regions": [
+            "body"
+        ],
+        "id": "u:366b163ac78e",
+        "pullRefresh": {
+            "disabled": true
+        }
+    }
+}

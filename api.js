@@ -6,6 +6,7 @@
 const crypto = require("crypto");
 const JWT = require('jsonwebtoken');
 const { getModels } = require("./extends");
+const { usePager, useDeleter } = require("./table")
 
 /**
  * 解析token到用户对象
@@ -850,6 +851,143 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
             msg: "密码修改成功，请重新登录。"
         }
     }).setPermission("修改密码");
+
+    //接口管理
+    router.get("system:apis", "/settings/apis", async function (ctx) {
+        let models = await db.table("models").where({ status: "enable" }).orderBy(p => p.order).toArray()
+        models = models.map(x => {
+            const level = x.id.split(':').length;
+            x.level = level;
+            if (level === 1) {
+                x.parent = "";
+            }
+            else {
+                x.parent = x.id.replace(/:[^:]+$/ig, '');
+            }
+            if (!x.name) x.name = x.id;
+            if (x.fields && x.fields.length) {
+                x.fields = x.fields.split(',');
+            }
+            else {
+                x.fields = [];
+            }
+            x.descByTime = x.desc_by_time === 1;
+            x.hasTime = x.has_time === 1;
+            x.updater = x.updater === 1;
+            //delete x.desc_by_time;
+            return x;
+        });
+        function loadChildren(pid) {
+            const children = models.filter(x => x.parent === pid);
+            for (const child of children) {
+                child.children = loadChildren(child.id);
+            }
+            if (children.length) return children;
+        }
+        const items = loadChildren("");
+        ctx.body = {
+            status: 0,
+            data: {
+                items: items || []
+            }
+        }
+    }).setPermission("接口管理");
+    function useApiMiddleware(mode) {
+        return async function (ctx) {
+            // let { id, name, path, status, type, method } = ctx.request.body;
+            if (mode === 'update') {
+                if (!ctx.request.query.id || !ctx.request.query.id.length) {
+                    return ctx.body = {
+                        status: 0,
+                        msg: '缺少原始接口id'
+                    }
+                }
+            }
+            const required = ['id', 'name', 'path', 'status', 'type', 'method'];
+            if (ctx.request.body.type === "simple") {
+                required.push('usefunc');
+                required.push("table");
+                if (ctx.request.body.usefunc === "useUpdater") {
+                    required.push("entity");
+                }
+                else if (ctx.request.body.usefunc === "useUpdater") {
+                    required.push("useInsert");
+                }
+            }
+            for (const field of required) {
+                const v = ctx.request.body[field];
+                if (v === null || v === undefined || v === "") {
+                    return ctx.body = {
+                        status: 1,
+                        msg: '缺少必要参数 ' + field
+                    }
+                }
+            }
+            const entity = {
+                id: ctx.request.body.id,
+                name: ctx.request.body.name,
+                path: ctx.request.body.path,
+                method: ctx.request.body.method,
+                status: ctx.request.body.status,
+                order: ctx.request.body.order || 0,
+                type: ctx.request.body.type,
+                //created_at: Date.now(),
+                //updated_at: 0
+            }
+            if (entity.type === "simple") {
+                entity.usefunc = ctx.request.body.usefunc;
+                entity.table = ctx.request.body.table;
+                if (entity.usefunc === "usePager") {
+                    entity.where = ctx.request.body.where;
+                    entity.variables = ctx.request.body.variables;
+                    entity.fields = (ctx.request.body.fields || []).join(",");
+                    entity.desc_by_time = ctx.request.body.descByTime ? 1 : 0;
+                }
+                else if (entity.usefunc === "useUpdater") {
+                    entity.where = ctx.request.body.where;
+                    entity.variables = ctx.request.body.variables;
+                    entity.entity = ctx.request.body.entity;
+                }
+                else if (entity.usefunc === "useDeleter") {
+                    entity.where = ctx.request.body.where;
+                    entity.variables = ctx.request.body.variables;
+                }
+                else if (entity.usefunc === "useInsert") {
+                    entity.entity = ctx.request.body.entity;
+                    entity.has_time = ctx.request.body.hasTime ? 1 : 0;
+                    entity.updater = ctx.request.body.updater ? 1 : 0;
+                }
+            }
+            else if(entity==='customize'){
+                entity.codes=ctx.request.body.codes
+            }
+            if (mode === 'insert') {
+                entity.updated_at = 0;
+                entity.created_at = Date.now();
+                try {
+                    await db.table("models").insert(entity);
+                }
+                catch (e) {
+                    if (e.code === 'ER_DUP_ENTRY') {
+                        return ctx.body = {
+                            status: 500,
+                            msg: '存在相同记录。'
+                        }
+                    }
+                }
+            }
+            else if (mode === 'update') {
+                entity.updated_at = Date.now();
+                await db.table("models").where({ id: ctx.request.query.id }).update(entity);
+            }
+            ctx.body = {
+                status: 0
+            }
+        }
+    }
+    router.post("system:apis:post", "/settings/apis", useApiMiddleware("insert")).setPermission("添加接口");
+    router.patch("system:apis:patch", "/settings/apis", useApiMiddleware("update")).setPermission("编辑接口");
+    router.delete("system:apis:delete", "/settings/api", useDeleter(() => db.table("models"), p => p.id == id, { id: ({ query }) => query.id })).setPermission("删除接口");
 }
 /**
  * 添加模块到Server中，便于进行授权操作
