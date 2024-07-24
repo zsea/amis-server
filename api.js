@@ -3,7 +3,9 @@
 // logger.level = process.env['AMIS.LOGGER'] || "TRACE"
 // var Router = require('@koa/router');
 // const Linq = require("linq2mysql");
-const crypto = require("crypto");
+const crypto = require("crypto")
+    , Event = require("events").EventEmitter
+    ;
 const JWT = require('jsonwebtoken');
 const { getModels } = require("./extends");
 const { usePager, useDeleter } = require("./table")
@@ -95,8 +97,9 @@ async function canVisit(user, model, db) {
  * @param {Linq} db 
  * @param {string} JWT_SECRET - 生成JWT的密钥
  * @param {string} tokenName - 生成cookie的名称
+ * @param {Event} watcher - API变化时的事件触发器
  */
-function AmisServer(router, db, JWT_SECRET, tokenName) {
+function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
     tokenName = tokenName || "amis_token";
     var isAllow = function (user, model) {
         return canVisit(user, model);
@@ -232,7 +235,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
             }
         }
         await loadLimit(models);
-        ctx.body = `window.___allow___=${JSON.stringify(___allow___)};`
+        ctx.body = `window.___allow___=${JSON.stringify(___allow___)};window.canAllow=function(id){return ___allow___[id]!==true}\n`
     }).setPermission("权限列表", true);
     // console.log(getModels(router));
     router.get("login", '/menus', async function (ctx) {
@@ -853,6 +856,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
     }).setPermission("修改密码");
 
     //接口管理
+
     router.get("system:apis", "/settings/apis", async function (ctx) {
         let models = await db.table("models").where({ status: "enable" }).orderBy(p => p.order).toArray()
         models = models.map(x => {
@@ -895,6 +899,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
     function useApiMiddleware(mode) {
         return async function (ctx) {
             // let { id, name, path, status, type, method } = ctx.request.body;
+            let origin;
             if (mode === 'update') {
                 if (!ctx.request.query.id || !ctx.request.query.id.length) {
                     return ctx.body = {
@@ -931,9 +936,11 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
                 status: ctx.request.body.status,
                 order: ctx.request.body.order || 0,
                 type: ctx.request.body.type,
+                anonymous: ctx.request.body.anonymous || 0
                 //created_at: Date.now(),
                 //updated_at: 0
             }
+            //console.log(entity);
             if (entity.type === "simple") {
                 entity.usefunc = ctx.request.body.usefunc;
                 entity.table = ctx.request.body.table;
@@ -958,8 +965,9 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
                     entity.updater = ctx.request.body.updater ? 1 : 0;
                 }
             }
-            else if(entity==='customize'){
-                entity.codes=ctx.request.body.codes
+            else if (entity.type === 'customize') {
+                entity.codes = ctx.request.body.codes;
+                //console.log(ctx.request.body)
             }
             if (mode === 'insert') {
                 entity.updated_at = 0;
@@ -977,8 +985,24 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
                 }
             }
             else if (mode === 'update') {
+                origin = await db.table("models").where({ id: ctx.request.query.id }).first();
                 entity.updated_at = Date.now();
                 await db.table("models").where({ id: ctx.request.query.id }).update(entity);
+            }
+            if (watcher) {
+                let eventName = null;
+                if (mode === "insert") {
+                    eventName = "added";
+                }
+                else if (mode === "update") {
+                    eventName = "changed";
+                    if (ctx.request.query.id !== entity.id) {
+                        watcher.emit("deleted", ctx.request.query.id);
+                    }
+                }
+                if (eventName) {
+                    watcher.emit(eventName, entity.id, origin);
+                }
             }
             ctx.body = {
                 status: 0
@@ -987,7 +1011,24 @@ function AmisServer(router, db, JWT_SECRET, tokenName) {
     }
     router.post("system:apis:post", "/settings/apis", useApiMiddleware("insert")).setPermission("添加接口");
     router.patch("system:apis:patch", "/settings/apis", useApiMiddleware("update")).setPermission("编辑接口");
-    router.delete("system:apis:delete", "/settings/api", useDeleter(() => db.table("models"), p => p.id == id, { id: ({ query }) => query.id })).setPermission("删除接口");
+    function useApiDelete() {
+        const m = useDeleter(() => db.table("models"), p => p.id == id, { id: ({ query }) => query.id })
+        return async function (ctx, next) {
+            await m(ctx, next);
+            if (watcher && ctx.body && ctx.body.status === 0) {
+                watcher.emit("deleted", ctx.request.query.id);
+            }
+        }
+    }
+    router.delete("system:apis:delete", "/settings/api", useApiDelete()).setPermission("删除接口");
+    router.get("system:apis:reload", "/settings/apis/reload", async function (ctx, next) {
+        if (watcher) {
+            watcher.emit("reload");
+        }
+        ctx.body = {
+            status: 0
+        }
+    }).setPermission("重新加载接口");
 }
 /**
  * 添加模块到Server中，便于进行授权操作
@@ -1014,10 +1055,11 @@ AmisServer.prototype.setPermission = function (id, name) {
  * @param {Linq} db 
  * @param {string} JWT_SECRET - 生成JWT的密钥
  * @param {string?} tokenName - 生成cookie的名称
+ * @param {Event} watcher - API变化时的事件触发器 
  * @returns AmisServer
  */
-function useAmisServer(router, db, JWT_SECRET) {
-    return new AmisServer(router, db, JWT_SECRET);
+function useAmisServer(router, db, JWT_SECRET, tokenName, watcher) {
+    return new AmisServer(router, db, JWT_SECRET, tokenName, watcher);
 }
 
 module.exports = {

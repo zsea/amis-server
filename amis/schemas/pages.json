@@ -205,7 +205,8 @@
                             "type": "button",
                             "level": "link",
                             "visibleOn": "this.is_system_page===0",
-                            "disabledOn": "___allow___['system:pages:editor']!==true",
+                            "disabledOn": "___allow___['system:pages:editor']!==true||this.schema_mode!=='json'",
+                            "disabledTip":"配置模式不为URL，不能使用在线编辑。",
                             "onEvent": {
                                 "click": {
                                     "actions": [

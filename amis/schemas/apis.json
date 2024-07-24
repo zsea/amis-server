@@ -24,6 +24,7 @@
                             "behavior": "create"
                         },
                         "id": "u:b457a42bde0f",
+                        "disabledOn": "canAllow('system:apis:post')",
                         "drawer": {
                             "title": "新增接口",
                             "body": {
@@ -111,6 +112,18 @@
                                         "name": "order",
                                         "label": "排序",
                                         "value": 0
+                                    },
+                                    {
+                                        "type": "checkbox",
+                                        "name": "anonymous",
+                                        "label": "",
+                                        "value": 0,
+                                        "option": "匿名接口",
+                                        "trueValue": 1,
+                                        "falseValue": 0
+                                    },
+                                    {
+                                        "type": "divider"
                                     },
                                     {
                                         "type": "radios",
@@ -218,7 +231,7 @@
                                                 "label": "variables",
                                                 "name": "variables",
                                                 "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
-                                                "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                "placeholder": "{\n\tid:({body,query,user})=>query.id,\n\tname:({body,query,user})=>body.name\n}",
                                                 "size": "line5",
                                                 "options": {
                                                     "lineNumbers": "on"
@@ -232,7 +245,7 @@
                                                 "name": "entity",
                                                 "required": true,
                                                 "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
-                                                "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                "placeholder": "{\n\tid:({body,query,user})=>query.id,\n\tname:({body,query,user})=>body.name\n}",
                                                 "size": "line5",
                                                 "options": {
                                                     "lineNumbers": "on"
@@ -294,8 +307,27 @@
                         "label": "",
                         "align": "right",
                         "icon": "fa fa-repeat",
-                        "target": "u:2d6e7fa5fee2",
-                        "actionType": "reload"
+                        "target": "t:apiscrud",
+                        "actionType": "reload",
+                        "disabledOn": "canAllow('system:apis')"
+                    },
+                    {
+                        "type": "button",
+                        "tpl": "内容",
+                        "wrapperComponent": "",
+                        "id": "u:306fd88b1f57",
+                        "label": "重新加载",
+                        "align": "right",
+                        "confirmText": "你确定要重新加载所有接口数据吗？",
+                        "tooltip": "在服务器中重新加载所有接口数据。",
+                        "level": "warning",
+                        "disabledOn": "canAllow('system:apis:reload')",
+                        "actionType": "ajax",
+                        "api": "get:/api/amis/settings/apis/reload",
+                        "messages": {
+                            "success": "重载成功。",
+                            "failed": "重载失败。"
+                        }
                     }
                 ],
                 "id": "t:apiscrud",
@@ -328,7 +360,13 @@
                         "label": "接口",
                         "type": "tpl",
                         "name": "path",
-                        "tpl":"${method}:${path}"
+                        "tpl": "${method}:${path}"
+                    },
+                    {
+                        "label": "匿名",
+                        "type": "tpl",
+                        "name": "anonymous",
+                        "tpl": "${anonymous===1?'是':'否'}"
                     },
                     {
                         "name": "type",
@@ -459,6 +497,18 @@
                                                 "value": 0
                                             },
                                             {
+                                                "type": "checkbox",
+                                                "name": "anonymous",
+                                                "label": "",
+                                                "value": 0,
+                                                "option": "匿名接口",
+                                                "trueValue": 1,
+                                                "falseValue": 0
+                                            },
+                                            {
+                                                "type": "divider"
+                                            },
+                                            {
                                                 "type": "radios",
                                                 "name": "type",
                                                 "label": "代码类型",
@@ -564,7 +614,7 @@
                                                         "label": "variables",
                                                         "name": "variables",
                                                         "visibleOn": "${usefunc==='useUpdater'||usefunc==='usePager'||usefunc==='useDeleter'}",
-                                                        "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                        "placeholder": "{\n\tid:({body,query,user})=>query.id,\n\tname:({body,query,user})=>body.name\n}",
                                                         "size": "line5",
                                                         "options": {
                                                             "lineNumbers": "on"
@@ -578,7 +628,7 @@
                                                         "name": "entity",
                                                         "required": true,
                                                         "visibleOn": "${usefunc==='useUpdater'||usefunc==='useInsert'}",
-                                                        "placeholder": "({body,query,user})=>({id:()=>query.id,name:()=>body.name})",
+                                                        "placeholder": "{\n\tid:({body,query,user})=>query.id,\n\tname:({body,query,user})=>body.name\n}",
                                                         "size": "line5",
                                                         "options": {
                                                             "lineNumbers": "on"

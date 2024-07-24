@@ -7,6 +7,8 @@ A Simple Backend Management System Implemented with Baidu AMIS
 - Account Management
 - Role Management
 - Password Change
+- Page Design
+- API Management
 
 # Installation
 
@@ -38,15 +40,16 @@ extendRouter(Router, useAuthenticate(db));
 2. Create an `AmisServer` object, which implements basic permission management functionality.
 
 ```javascript
-const server = useAmisServer(router, db, JWT_SECRET, tokenName);
+const server = useAmisServer(router, db, JWT_SECRET, tokenName,watcher);
 // or
-const server = new AmisServer(router, db, JWT_SECRET, tokenName);
+const server = new AmisServer(router, db, JWT_SECRET, tokenName,watcher);
 ```
 
 * `router` is an instance of `koa-router`.
 * `db` is a `Linq` instance.
 * `JWT_SECRET` is the secret key for `JWT`.
 * `tokenName` is the cookie name where the `token` is stored after a successful login.
+* `watcher` is an event monitoring mechanism, which is currently mainly used for triggering the server to reload API data when there are changes to the API.
 
 > The access path prefix here must be `/api/amis`, i.e., the `prefix` value passed to the `router` in `useAmisServer` is `/api/amis`.
 
@@ -123,6 +126,16 @@ useTable(() => db.table("users"));
 In the above object, the value of `id` will be generated at runtime. `query` and `body` are the objects passed in via `GET` and `POST`, respectively. `user` is the current logged-in object.
 
 > The term `POST` mentioned above actually refers to: methods that can pass a body, such as POST/PATCH, etc.
+
+# API Management
+The system provides simple API management capabilities, capable of performing ```CRUD``` operations on the database.
+
+## Example
+
+```js
+const cloud = new Cloud();
+await cloud.use({db, dbs}, authorize, parseUser, watcher);
+```
 
 # Miscellaneous
 

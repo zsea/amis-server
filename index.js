@@ -1,6 +1,8 @@
 const { extendRouter } = require("./extends")
     , { AmisServer, useAuthenticate, useAmisServer, useUser } = require("./api")
     , { usePager, useUpdater, useDeleter, useInsertOrUpdate, useInsert } = require("./table")
+    , { useCloud } = require("./cloud")
+    , Cloud = require("./cloud")
     , path = require("path")
     ;
 const htmlPath = path.join(__dirname, 'amis.asar');
@@ -24,5 +26,7 @@ module.exports = {
     useUpdater,
     useDeleter,
     useInsertOrUpdate,
-    useInsert
+    useInsert,
+    useCloud,
+    Cloud
 }

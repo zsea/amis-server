@@ -7,6 +7,8 @@
 * 账号管理
 * 角色管理
 * 密码修改
+* 页面设计
+* API管理
 
 # 安装
 
@@ -38,15 +40,16 @@ extendRouter(Router,useAuthenticate(db),useUser(SECRET,tokenName));
 2. 创建一个```AmisServer```对象，```AmisServer```中实现了基本的权限管理功能。
 
 ```js
-const server=useAmisServer(router,db,JWT_SECRET,tokenName);
+const server=useAmisServer(router,db,JWT_SECRET,tokenName,watcher);
 // 或者
-const server=new AmisServer(router,db,JWT_SECRET,tokenName);
+const server=new AmisServer(router,db,JWT_SECRET,tokenName,watcher);
 ```
 
 * ```router```为```koa-router```实例。
 * ```db```为```Linq```实例。
 * ```JWT_SECRET```为```JWT```的密钥。
 * ```tokenName```为登录成功后存储```token```的```cookie```名称。
+* ```watcher```为监控事件，目前主要用于处理API变化时让服务端重新加载API数据。
 
 > 此处的访问路径前缀必须是```/api/amis```，即```useAmisServer```中传入的```router```的```prefix```值为```/api/amis```。
 
@@ -120,6 +123,16 @@ useTable(()=>db.table("users"));
 在上面的对象中，```id```的值会在运行时生成。```query```和```body```分别是```GET```和```POST```传入的对象。```user```为当前登录对象。
 
 > 上面说的```POST```实际指：POST/PATCH等可以传入body的方法。
+
+# API管理
+系统提供简单的API管理功能，可以完成数据库的```CRUD```操作。
+
+## 示例
+
+```js
+const cloud = new Cloud();
+await cloud.use({db,dbs}, authorize, parseUser,watcher);
+```
 
 # 其它
 
