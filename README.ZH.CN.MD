@@ -24,7 +24,7 @@ const { htmlPath,extendRouter,AmisServer,useAmisServer,useAuthenticate } = requi
 
 > 包中没有包含```Koa-Router```，你需要在你的项目中手动引入。
 
-1. 为```Router```对象添加权限设置方法，方便自己开发模块时可以直接设置模块的错误。
+1. 为```Router```对象添加权限设置方法，方便自己开发模块时可以直接设置模块的权限。
 
 ```js
 extendRouter(Router,useAuthenticate(db),useUser(SECRET,tokenName));

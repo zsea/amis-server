@@ -24,7 +24,7 @@ const { htmlPath, extendRouter, AmisServer, useAmisServer, useAuthenticate } = r
 
 > The package does not include `Koa-Router`; you need to manually introduce it in your project.
 
-1. Add a permission setting method to the `Router` object to facilitate the direct setting of errors in the modules you develop.
+1. Add permission setting methods to the `Router` object to facilitate the direct setting of permissions for modules during self-development.
 
 ```javascript
 extendRouter(Router, useAuthenticate(db));
