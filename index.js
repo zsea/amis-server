@@ -6,6 +6,7 @@ const { extendRouter } = require("./extends")
     , path = require("path")
     ;
 const htmlPath = path.join(__dirname, 'amis.asar');
+const mysqlPath = path.join(__dirname, "mysql.sql");
 module.exports = {
     /**
      * 为所有的Router原型添加setPression方法
@@ -22,6 +23,7 @@ module.exports = {
     useAuthenticate,
     useUser,
     htmlPath,
+    mysqlPath,
     usePager,
     useUpdater,
     useDeleter,
