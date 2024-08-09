@@ -101,8 +101,11 @@ async function canVisit(user, model, db) {
  */
 function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
     tokenName = tokenName || "amis_token";
+    this.options["secret"] = JWT_SECRET;
+    this.options["tokenName"] = tokenName;
+    this.options["expiresIn"] = 7; //cookie存储的时间（单位：天）
     var isAllow = function (user, model) {
-        return canVisit(user, model);
+        return canVisit(user, model, db);
     }
 
     var emptyRouter = { stack: [] }
@@ -172,8 +175,8 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
             return
         }
         await db.table("users").where({ id: user.id }).update({ last_error_at: 0, error_times: 0 });
-        const token = JWT.sign(tokenUser, JWT_SECRET, { expiresIn: "7d" });
-        ctx.cookies.set(tokenName, token, { maxAge: rember ? 7 * 24 * 60 * 60 * 1000 : undefined });
+        const token = JWT.sign(tokenUser, self.options["secret"], { expiresIn: self.options["expiresIn"] + "d" });
+        ctx.cookies.set(tokenName, token, { maxAge: rember ? self.options["expiresIn"] * 24 * 60 * 60 * 1000 : undefined });
         ctx.body = {
             status: 0,
             msg: '登录成功'
@@ -238,7 +241,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
         ctx.body = `window.___allow___=${JSON.stringify(___allow___)};window.canAllow=function(id){return ___allow___[id]!==true}\n`
     }).setPermission("权限列表", true);
     // console.log(getModels(router));
-    router.get("login", '/menus', async function (ctx) {
+    router.get(/*"login",*/ '/menus', async function (ctx) {
         const pages = (await db.table("pages").orderBy(x => x.order).toArray()).map(x => {
 
             if (x.schema_mode === "json") {
@@ -291,9 +294,9 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
                 }]
             }
         }
-    }).setPermission("登录");
+    })//.setPermission("登录");
 
-    router.get("login", "/schema/:id", async function (ctx) {
+    router.get(/*"login",*/ "/schema/:id", async function (ctx) {
         const { id } = ctx.params
         if (!id) {
             return ctx.body = {
@@ -319,7 +322,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
             data: JSON.parse(page.schema || JSON.stringify({ type: "page" }))
         }
         ctx.headers["content-type"] = "application/json; charset=utf-8";
-    }).setPermission("");
+    });//.setPermission("");
 
     router.get("limit:user", '/users', async function (ctx) {
         const users = (await db.table("users").orderBy(x => x.created_at).toArray()).map(x => {
@@ -858,7 +861,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
     //接口管理
 
     router.get("system:apis", "/settings/apis", async function (ctx) {
-        let models = await db.table("models").where({ status: "enable" }).orderBy(p => p.order).toArray()
+        let models = await db.table("models").orderBy(p => p.order).toArray()
         models = models.map(x => {
             const level = x.id.split(':').length;
             x.level = level;
@@ -936,7 +939,8 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
                 status: ctx.request.body.status,
                 order: ctx.request.body.order || 0,
                 type: ctx.request.body.type,
-                anonymous: ctx.request.body.anonymous || 0
+                anonymous: ctx.request.body.anonymous || 0,
+                has_time: ctx.request.body.hasTime ? 1 : 0
                 //created_at: Date.now(),
                 //updated_at: 0
             }
@@ -1049,6 +1053,26 @@ AmisServer.prototype.setPermission = function (id, name) {
     this.emptyRouter.stack.push({ name: id, text: name });
     return this;
 }
+/**
+ * 生成登录的token字符串
+ * @param {*} user - 用户信息 
+ * @param {boolean|string} rember - 是否持久化
+ * @returns {string} 
+ */
+AmisServer.prototype.getToken = function (user, rember) {
+    const options = {};
+    if (typeof rember === "boolean" && rember === true) {
+        options["expiresIn"] = this.options["expiresIn"] + "d";
+    }
+    else if (typeof rember === "string") {
+        options["expiresIn"] = rember;
+    }
+    return JWT.sign(user, this.options["secret"], options);
+}
+/**
+ * 存储当前服务的一些设置项
+ */
+AmisServer.prototype.options = {};
 /**
  * Amis Server对象
  * @param {Router} router 
