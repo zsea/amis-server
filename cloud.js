@@ -4,9 +4,9 @@ const { usePager, useDeleter, useUpdater, useInsert } = require("./table")
 function Cloud() {
 
 }
-function parseFunction(code, db, dbs) {
-    let f = new Function("db", "dbs", code);
-    const md = f(db, dbs);
+function parseFunction(code, db, dbs, helper) {
+    let f = new Function("db", "dbs", "require", "helper", code);
+    const md = f(db, dbs, require, helper);
     delete f;
     return md;
 }
@@ -19,21 +19,22 @@ Cloud.prototype.stack = [];
  * @param {*} authorize 
  * @param {*} parseUser 
  * @param {Event} watcher - 接口变化的事件
+ * @param {object} helper - 用户自定义的辅助功能
  * @returns 
  */
-Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher) {
+Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher, helper) {
     // const dbs = undefined;
     let index = {}, middlewares = {}, models = [], self = this;
 
     function createMiddleware(m) {
         if (m.type === "customize") {
-            return parseFunction([' return async function(ctx,next){', m.codes, '}'].join('\n'), db, dbs);
+            return parseFunction([' return async function(ctx,next){', m.codes, '}'].join('\n'), db, dbs, helper);
         }
         else if (m.type === 'simple') {
-            const useTable = parseFunction('return ' + m.table, db, dbs);
+            const useTable = parseFunction('return ' + m.table, db, dbs, helper);
             if (m.usefunc === "usePager") {
-                const variables = parseFunction('return ' + m.variables, db, dbs);
-                const where = parseFunction('return ' + m.where);
+                const variables = parseFunction('return ' + m.variables, db, dbs, helper);
+                const where = parseFunction('return ' + m.where, helper);
                 let fields = m.fields;
                 if (fields && fields.length) fields = fields.split(',');
                 if (!fields || !fields.length) fields = null
@@ -41,20 +42,20 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
                 return md;
             }
             else if (m.usefunc === "useUpdater") {
-                const variables = parseFunction('return ' + m.variables, db, dbs);
-                const where = parseFunction('return ' + m.where, db, dbs);
-                const entity = parseFunction('return ' + m.entity, db, dbs);
+                const variables = parseFunction('return ' + m.variables, db, dbs, helper);
+                const where = parseFunction('return ' + m.where, db, dbs, helper);
+                const entity = parseFunction('return ' + m.entity, db, dbs, helper);
                 const md = useUpdater(useTable, where, variables, entity, m.has_time === 1);
                 return md;
             }
             else if (m.usefunc === "useDeleter") {
-                const variables = parseFunction('return ' + m.variables, db, dbs);
-                const where = parseFunction('return ' + m.where, db, dbs);
+                const variables = parseFunction('return ' + m.variables, db, dbs, helper);
+                const where = parseFunction('return ' + m.where, db, dbs, helper);
                 const md = useDeleter(useTable, where, variables);
                 return md;
             }
             else if (m.usefunc === "useInsert") {
-                const entity = parseFunction('return ' + m.entity, db, dbs);
+                const entity = parseFunction('return ' + m.entity, db, dbs, helper);
                 const md = useInsert(useTable, entity, m.has_time === 1, m.updater === 1);
                 return md;
             }
@@ -75,12 +76,12 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
         self.stack = __stack__;
     };
     async function loadOne(id, old) {
-       
+
         const m = await db.table("models").where({ status: "enable", id: id }).first();
         if (m) {
             // 更新
-            if(old){
-                const okey= `${old.method}:${old.path}`;
+            if (old) {
+                const okey = `${old.method}:${old.path}`;
                 delete index[okey];
                 delete middlewares[okey];
             }
@@ -118,7 +119,7 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
         }
     }
     if (watcher) {
-        watcher.addListener("reload",loadModels);
+        watcher.addListener("reload", loadModels);
         watcher.addListener("deleted", removeModel);
         watcher.addListener("changed", loadOne);
         watcher.addListener("added", loadOne);
@@ -153,8 +154,19 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
     }
 }
 module.exports = Cloud;
-module.exports.useCloud = async function ({ db, dbs }, authorize, parseUser, watcher) {
-    const cloud=new Cloud();
-    return await cloud.use({ db, dbs }, authorize, parseUser, watcher);
-    
+/**
+ * 
+ * @param {object} database - 数据库配置
+ * @param {Linq} database.db - 默认数据库连接，一般连接到amis系统数据库
+ * @param {object} database.dbs - 数据库连接对象池
+ * @param {*} authorize 
+ * @param {*} parseUser 
+ * @param {Event} watcher - 接口变化的事件
+ * @param {object} helper - 用户自定义的辅助功能
+ * @returns 
+ */
+module.exports.useCloud = async function ({ db, dbs }, authorize, parseUser, watcher, helper) {
+    const cloud = new Cloud();
+    return await cloud.use({ db, dbs }, authorize, parseUser, watcher, helper);
+
 }

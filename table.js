@@ -33,7 +33,7 @@ async function createObject(ctx, variables) {
  * @returns 
  */
 async function createDB(ctx, useTable, where, variables) {
-    let db = await Promise.resolve(useTable());
+    let db = await Promise.resolve(useTable({ query: ctx.request.query, body: ctx.request.body, user: ctx.user }));
     if (where) {
         const q = await createObject(ctx, variables);
         db = db.where(where, q);

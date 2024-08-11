@@ -294,7 +294,7 @@ function AmisServer(router, db, JWT_SECRET, tokenName, watcher) {
                 }]
             }
         }
-    })//.setPermission("登录");
+    }).setPermission("权限列表", true);//.setPermission("登录");
 
     router.get(/*"login",*/ "/schema/:id", async function (ctx) {
         const { id } = ctx.params

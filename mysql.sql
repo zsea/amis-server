@@ -5,13 +5,13 @@
  Source Server Type    : MySQL
  Source Server Version : 80029 (8.0.29)
  Source Host           : localhost:3306
- Source Schema         : lr
+ Source Schema         : amis
 
  Target Server Type    : MySQL
  Target Server Version : 80029 (8.0.29)
  File Encoding         : 65001
 
- Date: 08/08/2024 22:23:42
+ Date: 11/08/2024 22:32:27
 */
 
 SET NAMES utf8mb4;
@@ -27,7 +27,7 @@ CREATE TABLE `application`  (
   `created_at` bigint NULL DEFAULT NULL,
   `updated_at` bigint NULL DEFAULT NULL,
   PRIMARY KEY (`key`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of application
@@ -36,7 +36,7 @@ INSERT INTO `application` VALUES ('asideAfter', NULL, 0, 0);
 INSERT INTO `application` VALUES ('asideBefore', NULL, 0, 0);
 INSERT INTO `application` VALUES ('brandName', 'HAdmin', 0, 0);
 INSERT INTO `application` VALUES ('className', NULL, 0, 0);
-INSERT INTO `application` VALUES ('footer', NULL, 0, 0);
+INSERT INTO `application` VALUES ('footer', '', 0, 0);
 INSERT INTO `application` VALUES ('header', '{\n  \"type\": \"grid\",\n  \"align\": \"between\",\n  \"valign\": \"middle\",\n  \"columns\": [\n    {\n      \"md\": 6,\n      \"body\": [\n        {\n          \"type\": \"plain\",\n          \"text\": \"\"\n        }\n      ]\n    },\n    {\n      \"md\": 6,\n      \"body\": {\n        \"type\": \"service\",\n        \"api\": \"get:/api/amis/self\",\n        \"body\": {\n          \"type\": \"flex\",\n          \"justify\": \"flex-end\",\n          \"items\": [\n            {\n              \"type\": \"service\",\n              \"api\": \"get:/api/amis/self\",\n              \"body\": {\n                \"type\": \"avatar\",\n                \"icon\": \"fa fa-user\",\n                \"src\": \"${avatar}\",\n                \"size\": \"small\",\n                \"className\": \"inline\"\n              }\n            },\n            {\n              \"type\": \"dropdown-button\",\n              \"label\": \"${username}\",\n              \"trigger\": \"hover\",\n              \"hideCaret\": false,\n              \"level\": \"link\",\n              \"buttons\": [\n                {\n                  \"type\": \"button\",\n                  \"label\": \"修改密码\",\n                  \"actionType\": \"link\",\n                  \"link\": \"/html/self/passwd\"\n                },\n                {\n                  \"type\": \"button\",\n                  \"label\": \"个人设置\",\n                  \"disabled\": true\n                },\n                {\n                  \"type\": \"divider\"\n                },\n                {\n                  \"type\": \"button\",\n                  \"label\": \"退出登录\",\n                  \"confirmText\": \"你确定要退出登录吗？\",\n                  \"confirmTitle\": \"请确认\",\n                  \"actionType\": \"ajax\",\n                  \"api\": \"get:/api/amis/logout\",\n                  \"redirect\": \"/html\"\n                }\n              ]\n            },\n            {\n              \"type\": \"tpl\",\n              \"className\": \"mx-3\"\n            }\n          ]\n        }\n      }\n    }\n  ]\n}', 0, 0);
 INSERT INTO `application` VALUES ('homePage', '/html/default', 0, 0);
 INSERT INTO `application` VALUES ('logo', '/html/amis/logo.png', 0, 0);
@@ -56,7 +56,7 @@ CREATE TABLE `models`  (
   `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `usefunc` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `table` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `table` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `where` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `variables` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `fields` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `models`  (
   `created_at` bigint NULL DEFAULT NULL,
   `updated_at` bigint NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of models
@@ -99,7 +99,7 @@ CREATE TABLE `pages`  (
   `created_at` bigint NULL DEFAULT 0,
   `updated_at` bigint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of pages
@@ -126,7 +126,7 @@ CREATE TABLE `permissions`  (
   `created_at` bigint NULL DEFAULT 0,
   `updated_at` bigint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of permissions
@@ -134,6 +134,7 @@ CREATE TABLE `permissions`  (
 INSERT INTO `permissions` VALUES ('login:00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'login', 2, 0, 0);
 INSERT INTO `permissions` VALUES ('self:00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'self', 2, 0, 0);
 INSERT INTO `permissions` VALUES ('self:passwd:00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'self:passwd', 2, 0, 0);
+INSERT INTO `permissions` VALUES ('system:00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000', 'system', 0, 0, 0);
 
 -- ----------------------------
 -- Table structure for roles
@@ -146,7 +147,7 @@ CREATE TABLE `roles`  (
   `created_at` bigint NULL DEFAULT 0,
   `updated_at` bigint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of roles
@@ -162,7 +163,7 @@ CREATE TABLE `user_role_links`  (
   `rid` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '角色id',
   `created_at` bigint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user_role_links
@@ -183,7 +184,7 @@ CREATE TABLE `users`  (
   `error_times` int NULL DEFAULT 0 COMMENT '连续登录的错误次数',
   `last_error_at` bigint NULL DEFAULT 0 COMMENT '最后一次错误的时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users

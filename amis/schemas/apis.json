@@ -205,7 +205,7 @@
                                                 "label": "useTable",
                                                 "name": "table",
                                                 "required": true,
-                                                "placeholder": "()=>db.table(\"amis\")",
+                                                "placeholder": "({body,query,user})=>db.table(\"amis\")",
                                                 "size": "line5",
                                                 "options": {
                                                     "lineNumbers": "on"

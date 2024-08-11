@@ -6,7 +6,7 @@ const { extendRouter, useAmisServer, useAuthenticate, useUser } = require("../in
 const JWT_SECRET = process.env["AMIS.SECRET"] || "amis";
 
 const db = new Linq(process.env["AMIS.MYSQL"] || "mysql://root@127.0.0.1/amis", function () {
-    console.log(arguments)
+    //console.log(arguments)
 });
 extendRouter(Router, useAuthenticate(db), useUser(JWT_SECRET));
 var router = new Router({

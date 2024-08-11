@@ -3,84 +3,92 @@
         "type": "page",
         "body": [
             {
-                "id": "u:171fd15b0e60",
-                "type": "form",
-                "title": "",
-                "mode": "horizontal",
-                "dsType": "api",
-                "feat": "Edit",
-                "body": [
-                    {
-                        "name": "username",
-                        "label": "账号",
-                        "type": "input-text",
-                        "id": "u:c390016dc1a7",
-                        "disabled": true
-                    },
-                    {
-                        "name": "password",
-                        "label": "原始密码",
-                        "type": "input-password",
-                        "id": "u:a060a37e5c63",
-                        "required": true,
-                        "showCounter": false,
-                        "validations": {},
-                        "validationErrors": {}
-                    },
-                    {
-                        "name": "newPassword",
-                        "label": "新密码",
-                        "type": "input-password",
-                        "id": "u:4bd5b28e67ee",
-                        "required": true,
-                        "showCounter": false,
-                        "validations": {},
-                        "validationErrors": {}
-                    },
-                    {
-                        "name": "confirmePassword",
-                        "label": "确认新密码",
-                        "type": "input-password",
-                        "id": "u:5a65b6b00bf0",
-                        "required": true,
-                        "validations": {
-                            "equalsField": "newPassword"
-                        },
-                        "validationErrors": {
-                            "equalsField": "两次密码不一致。"
-                        },
-                        "showCounter": false
-                    }
-                ],
-                "api": {
-                    "url": "/api/amis/self/passwd",
-                    "method": "post",
-                    "requestAdaptor": "api.data.newPassword=CryptoJS.MD5(api.data.newPassword).toString();api.data.password=CryptoJS.MD5(api.body.username + '#' + CryptoJS.MD5(api.data.password).toString()).toString();",
-                    "adaptor": "",
-                    "messages": {},
-                    "dataType": "json"
+                "type": "wrapper",
+                "style": {
+                    "width": "500px",
+                    "display": "block",
+                    "margin": "10px auto"
                 },
-                "actions": [
-                    {
-                        "type": "button",
-                        "label": "确认修改",
-                        "onEvent": {
-                            "click": {
-                                "actions": [
-                                    {
-                                        "actionType": "submit",
-                                        "componentId": "u:171fd15b0e60"
-                                    }
-                                ]
-                            }
+                "body": {
+                    "id": "u:171fd15b0e60",
+                    "type": "form",
+                    "title": "",
+                    "mode": "horizontal",
+                    "dsType": "api",
+                    "feat": "Edit",
+                    "body": [
+                        {
+                            "name": "username",
+                            "label": "账号",
+                            "type": "static",
+                            "id": "u:c390016dc1a7",
+                            "disabled": true
                         },
-                        "level": "primary",
-                        "id": "u:97fdbb6c2d51"
-                    }
-                ],
-                "resetAfterSubmit": false,
-                "initApi": "/api/amis/self",
-                "redirect": "/html"
+                        {
+                            "name": "password",
+                            "label": "原始密码",
+                            "type": "input-password",
+                            "id": "u:a060a37e5c63",
+                            "required": true,
+                            "showCounter": false,
+                            "validations": {},
+                            "validationErrors": {}
+                        },
+                        {
+                            "name": "newPassword",
+                            "label": "新密码",
+                            "type": "input-password",
+                            "id": "u:4bd5b28e67ee",
+                            "required": true,
+                            "showCounter": false,
+                            "validations": {},
+                            "validationErrors": {}
+                        },
+                        {
+                            "name": "confirmePassword",
+                            "label": "确认新密码",
+                            "type": "input-password",
+                            "id": "u:5a65b6b00bf0",
+                            "required": true,
+                            "validations": {
+                                "equalsField": "newPassword"
+                            },
+                            "validationErrors": {
+                                "equalsField": "两次密码不一致。"
+                            },
+                            "showCounter": false
+                        }
+                    ],
+                    "api": {
+                        "url": "/api/amis/self/passwd",
+                        "method": "post",
+                        "requestAdaptor": "api.data.newPassword=CryptoJS.MD5(api.data.newPassword).toString();api.data.password=CryptoJS.MD5(api.body.username + '#' + CryptoJS.MD5(api.data.password).toString()).toString();",
+                        "adaptor": "",
+                        "messages": {},
+                        "dataType": "json"
+                    },
+                    "actions": [
+                        {
+                            "type": "button",
+                            "label": "确认修改",
+                            "onEvent": {
+                                "click": {
+                                    "actions": [
+                                        {
+                                            "actionType": "submit",
+                                            "componentId": "u:171fd15b0e60"
+                                        }
+                                    ]
+                                }
+                            },
+                            "level": "primary",
+                            "id": "u:97fdbb6c2d51"
+                        }
+                    ],
+                    "resetAfterSubmit": false,
+                    "initApi": "/api/amis/self",
+                    "redirect": "/html"
+                }
             }
         ],
         "regions": [
