@@ -107,10 +107,7 @@ function getSchema() {
     }
     return {
         "type": "page",
-        "body": {
-            type: "tpl",
-            tpl: "空白页面"
-        },
+        "body": [],
         "regions": [
             "body"
         ]
