@@ -1,6 +1,8 @@
 
-window.addEventListener("load",
-    function () {
+
+(function () {
+
+    function main() {
         let amis = amisRequire('amis/embed');
         // 通过替换下面这个配置来生成不同页面
         document.title = `登录`;
@@ -164,4 +166,19 @@ window.addEventListener("load",
             }
         };
         let amisScoped = amis.embed('#root', amisJSON);
-    });
+    }
+
+    var t = setInterval(function () {
+        if (window.amisRequire === undefined) return;
+        clearInterval(t);
+        
+        //移除loading
+        document.querySelector("div.loading").remove();
+        //开始执行amis逻辑
+        main();
+    }, 100);
+
+
+})();
+
+

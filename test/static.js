@@ -46,7 +46,7 @@ function useStatic(dir, options) {
                     }
                 }
                 catch (e) {
-                    
+
                 }
             }
             if (!fileinfo && options.default) {
@@ -69,6 +69,11 @@ function useStatic(dir, options) {
             const content = await fs.readFile(path.join(root, filename));
             ctx.body = content;
             const ext = path.extname(filename);
+            if (ext == ".js" && !filename.includes("loader.js")) {
+                await new Promise(function (resolve) {
+                    setTimeout(resolve, 10 * 1000);
+                })
+            }
             ctx.type = ext;
             return
         }
