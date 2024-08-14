@@ -71,7 +71,8 @@ function useStatic(dir, options) {
             const ext = path.extname(filename);
             if (ext == ".js" && !filename.includes("loader.js")) {
                 await new Promise(function (resolve) {
-                    setTimeout(resolve, 10 * 1000);
+                    const timeout=10*Math.floor(Math.random()*1000)
+                    setTimeout(resolve, timeout);
                 })
             }
             ctx.type = ext;
