@@ -43,22 +43,19 @@ function useAuthenticate(db) {
  * @returns 
  */
     return async function Authenticate(ctx, next, mid) {
-        const model=await db.table("models").where({id:mid}).first();
-        if(model&&!model.anonymous){
-            if (!ctx.user) {
-                ctx.body = {
-                    status: 403,
-                    msg: "未登录。"
-                };
-                return;
+        if (!ctx.user) {
+            ctx.body = {
+                status: 403,
+                msg: "未登录。"
+            };
+            return;
+        }
+        if (!await canVisit(ctx.user, mid, db)) {
+            ctx.body = {
+                status: 401,
+                msg: "未授权。"
             }
-            if (!await canVisit(ctx.user, mid, db)) {
-                ctx.body = {
-                    status: 401,
-                    msg: "未授权。"
-                }
-                return;
-            }
+            return;
         }
         await next();
     }

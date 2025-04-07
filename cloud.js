@@ -126,7 +126,16 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
     }
 
     await loadModels();
+    function callMiddleware(key, ctx, next) {
+        const md = middlewares[key];
+        if (md) {
+            return Promise.resolve(md(ctx, next));
+        }
+        else {
+            ctx.status = 404;
+        }
 
+    }
     return async function (ctx, next) {
         if (!ctx.user) {
             await Promise.resolve(parseUser(ctx));
@@ -134,10 +143,14 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
         const key = `${ctx.method}:${ctx.path}`;
         const model = index[key];
         if (!model) {
-            ctx.status = 404;
+            return await next();
+        }
+        if (model.anonymous) {
+            //数据库中的匿名模块
+            await Promise.resolve(callMiddleware(key, ctx, next));
             return;
         }
-        if (!model.anonymous && !ctx.user) {
+        if (!ctx.user) {
             // 未登录，非匿名
             return ctx.body = {
                 status: 403,
