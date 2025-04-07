@@ -134,7 +134,8 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
         const key = `${ctx.method}:${ctx.path}`;
         const model = index[key];
         if (!model) {
-            return await next();
+            ctx.status = 404;
+            return;
         }
         if (!model.anonymous && !ctx.user) {
             // 未登录，非匿名
@@ -148,7 +149,7 @@ Cloud.prototype.use = async function ({ db, dbs }, authorize, parseUser, watcher
             if (md) {
                 return Promise.resolve(md(ctx, next));
             }
-        }, model.id);
+        }, model.id, model);
 
         //console.log(ctx.method);
     }
