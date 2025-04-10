@@ -1,6 +1,6 @@
 {
   "name": "@zsea/amis-server",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Frontend and backend universal package based on Amis.",
   "main": "index.js",
   "scripts": {
