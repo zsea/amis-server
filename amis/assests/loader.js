@@ -13,7 +13,7 @@ function HAdminLoader(res) {
                 let item = res[i];
                 let src = item.src;
                 if (item.amis) {
-                    src = host + src;
+                    src = (host||"") + src;
                 }
                 
                 if (item.type === "js") {
