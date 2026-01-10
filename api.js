@@ -46,6 +46,8 @@ function useAuthenticate(db) {
         if (!ctx.user) {
             ctx.body = {
                 status: 403,
+                location:"/html/",
+                sleep:5,
                 msg: "未登录。"
             };
             return;

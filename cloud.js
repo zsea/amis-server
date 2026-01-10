@@ -7,7 +7,7 @@ function Cloud() {
 function parseFunction(code, db, dbs, helper) {
     let f = new Function("db", "dbs", "require", "helper", code);
     const md = f(db, dbs, require, helper);
-    delete f;
+    // delete f;
     return md;
 }
 Cloud.prototype.stack = [];
