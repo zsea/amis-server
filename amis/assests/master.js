@@ -124,6 +124,18 @@ function getSchema() {
             "tpl": "Not Found"
         }
     };
-    amis.embed('#root', amisJSON);
+    amis.embed('#root', amisJSON,{}, {
+        responseAdaptor: (api, payload, query, request, response) => {
+            if (typeof payload === 'object') {
+                const { location, sleep } = payload;
+                if (location && location.length) {
+                    window.setTimeout(() => {
+                        window.location = location;
+                    }, (sleep || 0) * 1000);
+                }
+            }
+            return payload;
+        }
+    });
 
 })();
